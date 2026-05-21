@@ -1,0 +1,1638 @@
+/* ==========================================================================
+   MoEatzy - Premium Design System (Cool White Plastic & Glassmorphism)
+   ========================================================================== */
+
+:root {
+    /* Color Palette */
+    --bg-main: #F4F7FA;
+    --primary-ice: #E3F2FD;
+    --primary-blue: #90CAF9;
+    --text-navy: #1A237E;
+    --text-muted: #5C6BC0;
+    
+    /* D-Day Color Tokens */
+    --dday-danger-bg: #FFEBEE;
+    --dday-danger-txt: #C62828;
+    --dday-warn-bg: #FFF8E1;
+    --dday-warn-txt: #F57F17;
+    --dday-safe-bg: #E8F5E9;
+    --dday-safe-txt: #2E7D32;
+    
+    /* White Plastic Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.45);
+    --glass-shadow: 0 8px 32px 0 rgba(142, 172, 205, 0.12);
+    
+    /* Transition */
+    --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Global Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background: radial-gradient(circle at top left, #ECEFF1 0%, #CFD8DC 100%);
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    color: var(--text-navy);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* App Container (Mobile Frame Mockup) */
+.app-container {
+    width: 100%;
+    max-width: 400px;
+    height: 100vh;
+    background: linear-gradient(135deg, #F4F7FA 0%, #E8F1F5 100%);
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(26, 35, 126, 0.18),
+                0 0 0 12px rgba(255, 255, 255, 0.8),
+                0 0 0 13px rgba(26, 35, 126, 0.05);
+    border-radius: 40px; /* Rounded corners to look like a modern smartphone */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* App Header styling with cold refrigerator glass motif */
+.app-header {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: var(--glass-border);
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+}
+
+.logo {
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text-navy);
+}
+
+.logo span {
+    color: #42A5F5;
+    font-weight: 500;
+}
+
+.header-status {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(227, 242, 253, 0.8);
+    border-radius: 20px;
+    padding: 4px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #66BB6A;
+}
+
+.status-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+/* App Content Area */
+.app-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 20px 100px 20px; /* bottom padding accounts for tab-bar */
+    scroll-behavior: smooth;
+}
+
+/* Scrollbar customization */
+.app-content::-webkit-scrollbar {
+    width: 6px;
+}
+.app-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.app-content::-webkit-scrollbar-thumb {
+    background: rgba(26, 35, 126, 0.1);
+    border-radius: 3px;
+}
+
+/* Tab Bar CSS styling */
+.tab-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 76px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: var(--glass-border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px 10px 10px; /* extra bottom padding for bottom home indicator feel */
+    z-index: 10;
+    box-shadow: 0 -8px 24px rgba(142, 172, 205, 0.08);
+}
+
+.tab-item {
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 600;
+    flex: 1;
+    height: 100%;
+    position: relative;
+    transition: var(--transition-smooth);
+}
+
+.tab-icon {
+    font-size: 20px;
+    transition: var(--transition-smooth);
+    opacity: 0.6;
+}
+
+.tab-label {
+    transition: var(--transition-smooth);
+}
+
+/* Active tab styling with deep navy and bottom line */
+.tab-item.active {
+    color: var(--text-navy);
+}
+
+.tab-item.active .tab-icon {
+    transform: scale(1.15) translateY(-2px);
+    opacity: 1;
+}
+
+.tab-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    width: 20px;
+    height: 3px;
+    background-color: var(--text-navy);
+    border-radius: 2px;
+    animation: scale-up 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Animations */
+@keyframes scale-up {
+    0% { transform: scaleX(0); }
+    100% { transform: scaleX(1); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .4; }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ==========================================================================
+   Home/Inventory Screen Styles
+   ========================================================================== */
+
+.page-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-navy);
+    margin-bottom: 4px;
+}
+
+.page-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+/* Filter Taps */
+.filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    box-shadow: var(--glass-shadow);
+}
+
+.filter-btn:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.filter-btn.active {
+    background: var(--text-navy);
+    color: #FFFFFF;
+    border-color: var(--text-navy);
+    box-shadow: 0 4px 12px rgba(26, 35, 126, 0.2);
+}
+
+/* Inventory Cards Container */
+.inventory-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Refrigerator Plastic Shelf / Glassmorphic Card */
+.ingredient-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: var(--glass-border);
+    border-radius: 18px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--glass-shadow);
+    transition: var(--transition-smooth);
+    animation: slide-in 0.4s ease-out forwards;
+}
+
+.ingredient-card:hover {
+    transform: translateY(-2px) scale(1.01);
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 12px 36px 0 rgba(142, 172, 205, 0.2);
+}
+
+.card-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.ingredient-icon-container {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(227, 242, 253, 0.5);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.ingredient-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ingredient-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-navy);
+}
+
+.ingredient-location {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* D-day Badges */
+.dday-badge {
+    border-radius: 12px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.badge-danger {
+    background-color: var(--dday-danger-bg);
+    color: var(--dday-danger-txt);
+}
+
+.badge-warn {
+    background-color: var(--dday-warn-bg);
+    color: var(--dday-warn-txt);
+}
+
+.badge-safe {
+    background-color: var(--dday-safe-bg);
+    color: var(--dday-safe-txt);
+}
+
+@keyframes slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   Placeholder screens & global custom components
+   ========================================================================== */
+
+.placeholder-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100%;
+    min-height: 280px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: var(--glass-border);
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: var(--glass-shadow);
+    margin-top: 10px;
+}
+
+.placeholder-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 4px 8px rgba(26, 35, 126, 0.1));
+}
+
+.placeholder-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-navy);
+    margin-bottom: 8px;
+}
+
+.placeholder-desc {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Header Scan Button & Floating UI
+   ========================================================================== */
+
+.header-scan-btn {
+    background: rgba(227, 242, 253, 0.8);
+    border: 1px solid rgba(144, 202, 249, 0.4);
+    border-radius: 14px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-navy);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: var(--transition-smooth);
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6),
+                0 4px 10px rgba(142, 172, 205, 0.1);
+}
+
+.header-scan-btn:hover {
+    background: #FFFFFF;
+    border-color: #90CAF9;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(142, 172, 205, 0.2);
+}
+
+.header-scan-btn:active {
+    transform: translateY(0);
+}
+
+.header-scan-btn.scanned {
+    background: #E8F5E9;
+    border-color: #A5D6A7;
+    color: var(--dday-safe-txt);
+    cursor: not-allowed;
+}
+
+.scan-btn-icon {
+    font-size: 12px;
+}
+
+/* ==========================================================================
+   AI Smart Scan Modal Overlay & Card
+   ========================================================================== */
+
+.scan-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 35, 126, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.scan-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.scan-modal-card {
+    width: 88%;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: var(--glass-border);
+    border-radius: 28px;
+    padding: 24px;
+    box-shadow: 0 20px 50px rgba(26, 35, 126, 0.18);
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.scan-modal-overlay.active .scan-modal-card {
+    transform: translateY(0);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--text-muted);
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-smooth);
+}
+
+.modal-close-btn:hover {
+    background: rgba(26, 35, 126, 0.05);
+    color: var(--text-navy);
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-navy);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.modal-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+/* Options View */
+.scan-options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.scan-option-btn {
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    border-radius: 16px;
+    padding: 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-navy);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: var(--transition-smooth);
+    box-shadow: var(--glass-shadow);
+}
+
+.scan-option-btn:hover {
+    transform: translateY(-2px);
+    background: #FFFFFF;
+    box-shadow: 0 8px 24px rgba(142, 172, 205, 0.15);
+}
+
+.scan-option-btn:active {
+    transform: translateY(0);
+}
+
+.scan-option-btn .emoji-icon {
+    font-size: 24px;
+}
+
+.scan-option-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.scan-option-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-navy);
+}
+
+.scan-option-desc {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   Scanner Laser Animation & Technical Progress
+   ========================================================================== */
+
+.scan-loading-area {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px 0;
+}
+
+.scanner-viewfinder {
+    width: 100%;
+    height: 130px;
+    border: 2px dashed rgba(66, 165, 245, 0.4);
+    background: rgba(66, 165, 245, 0.02);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.scanner-laser-line {
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, rgba(66, 165, 245, 0) 0%, rgba(66, 165, 245, 1) 50%, rgba(66, 165, 245, 0) 100%);
+    box-shadow: 0 0 10px rgba(66, 165, 245, 0.8);
+    animation: laser-bounce 2s ease-in-out infinite;
+}
+
+.scanner-viewfinder-graphic {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 32px;
+    opacity: 0.2;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes laser-bounce {
+    0%, 100% { top: 0%; }
+    50% { top: calc(100% - 4px); }
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.12); }
+}
+
+.scan-loading-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-navy);
+    margin-bottom: 10px;
+}
+
+.progress-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(26, 35, 126, 0.05);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #42A5F5 0%, #1A237E 100%);
+    border-radius: 3px;
+    transition: width 0.1s linear;
+}
+
+.progress-pct {
+    font-size: 11px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Toast Notification Styling
+   ========================================================================== */
+
+.toast-notification {
+    position: absolute;
+    bottom: 90px;
+    left: 5%;
+    width: 90%;
+    background: rgba(26, 35, 126, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 14px 18px;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+}
+
+.toast-notification.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.toast-icon {
+    font-size: 18px;
+}
+
+/* ==========================================================================
+   Recipe Page Styles (Phase 3)
+   ========================================================================= */
+
+.recipe-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Glassmorphic Refrigerator Recipe Card */
+.recipe-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: var(--glass-border);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--glass-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: slide-in 0.4s ease-out forwards;
+}
+
+.recipe-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.recipe-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.recipe-meta-badges {
+    display: flex;
+    gap: 6px;
+}
+
+.recipe-meta-badge {
+    background: rgba(227, 242, 253, 0.8);
+    color: var(--text-navy);
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+/* Matching Ingredient Tags */
+.recipe-ingredients-required {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.recipe-ing-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-muted);
+    width: 100%;
+    margin-bottom: 2px;
+}
+
+.recipe-ing-tag {
+    font-size: 11px;
+    font-weight: 700;
+    background: #E8F5E9;
+    color: #2E7D32;
+    padding: 3px 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(46, 125, 50, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Numbered Step List styling */
+.recipe-steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.recipe-steps-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.recipe-step-item {
+    display: flex;
+    gap: 8px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--text-navy);
+    font-weight: 500;
+}
+
+.step-number {
+    background: var(--text-navy);
+    color: #FFFFFF;
+    font-family: 'Outfit', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.step-text {
+    flex: 1;
+}
+
+/* Action Button Panel */
+.recipe-action-bar {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.btn-rescue-success {
+    background: linear-gradient(135deg, #42A5F5 0%, #1A237E 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #FFFFFF;
+    font-size: 12.5px;
+    font-weight: 800;
+    cursor: pointer;
+    flex: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 4px 15px rgba(26, 35, 126, 0.2);
+    transition: var(--transition-smooth);
+}
+
+.btn-rescue-success:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 20px rgba(26, 35, 126, 0.3);
+}
+
+.btn-rescue-success:active {
+    transform: translateY(0);
+}
+
+.btn-rescue-fail {
+    background: transparent;
+    border: 1px solid rgba(26, 35, 126, 0.15);
+    border-radius: 12px;
+    padding: 12px;
+    color: var(--text-muted);
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: var(--transition-smooth);
+}
+
+.btn-rescue-fail:hover {
+    background: rgba(198, 40, 40, 0.05);
+    border-color: rgba(198, 40, 40, 0.3);
+    color: #C62828;
+}
+
+/* ==========================================================================
+   Zero-Dependency Confetti Particles
+   ========================================================================== */
+
+.confetti-particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    z-index: 1000;
+    pointer-events: none;
+    animation: confetti-fall 2.2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 1;
+    }
+    10% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(400px) translateX(var(--x-distance)) rotate(var(--rotation));
+        opacity: 0;
+    }
+}
+
+/* ==========================================================================
+   Rescue Success Reward Overlay
+   ========================================================================== */
+
+.reward-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 35, 126, 0.45);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+}
+
+.reward-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.reward-card {
+    width: 85%;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: var(--glass-border);
+    border-radius: 30px;
+    padding: 24px 20px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    transform: translateY(20px);
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.reward-overlay.active .reward-card {
+    transform: translateY(0);
+}
+
+.reward-badge-icon {
+    font-size: 44px;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.reward-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.reward-desc {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* Stats Row inside Reward Card */
+.reward-stats-container {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin: 5px 0;
+}
+
+.reward-stat-box {
+    flex: 1;
+    background: rgba(227, 242, 253, 0.5);
+    border: 1px solid rgba(144, 202, 249, 0.3);
+    border-radius: 16px;
+    padding: 10px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.reward-stat-val {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.reward-stat-val.saving {
+    color: #0D47A1;
+}
+
+.reward-stat-val.waste {
+    color: #2E7D32;
+}
+
+.reward-stat-label {
+    font-size: 9.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.btn-confirm-reward {
+    width: 100%;
+    background: var(--text-navy);
+    border: none;
+    border-radius: 14px;
+    padding: 12px;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(26, 35, 126, 0.25);
+    transition: var(--transition-smooth);
+}
+
+.btn-confirm-reward:hover {
+    background: #000051;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Smart Buying & Savings Report (Phase 4)
+   ========================================================================== */
+
+/* Savings Dashboard Frame */
+.savings-report-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: var(--glass-border);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: var(--glass-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+    animation: slide-in 0.4s ease-out forwards;
+}
+
+.savings-stats-row {
+    display: flex;
+    gap: 12px;
+}
+
+.savings-stat-panel {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.savings-stat-title {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-muted);
+}
+
+.savings-stat-bigval {
+    font-family: 'Outfit', sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--text-navy);
+}
+
+.savings-stat-bigval.eco {
+    color: #2E7D32;
+}
+
+/* Vanilla CSS Bar Graph */
+.savings-chart-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 5px;
+    border-top: 1px solid rgba(26, 35, 126, 0.05);
+}
+
+.chart-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.bar-graph-container {
+    height: 90px;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    padding: 0 10px;
+}
+
+.bar-graph-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.bar-wrapper {
+    height: 60px;
+    width: 24px;
+    background: rgba(26, 35, 126, 0.04);
+    border-radius: 6px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+.bar-fill {
+    width: 100%;
+    border-radius: 4px;
+    background: linear-gradient(to top, #42A5F5, #1A237E);
+    height: 0%; /* Dynamic height assigned */
+    transition: height 1s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
+}
+
+.bar-val {
+    font-family: 'Outfit', sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.bar-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Locked E-Commerce Basket & Subscription Mask
+   ========================================================================== */
+
+.locked-buying-section {
+    position: relative;
+    border-radius: 24px;
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    padding: 20px 20px 24px 20px;
+    box-shadow: var(--glass-shadow);
+    margin-bottom: 20px;
+    overflow: hidden;
+    min-height: 350px; /* Ensure floating card fits without clipping */
+    display: flex;
+    flex-direction: column;
+}
+
+.section-head-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-navy);
+    margin-bottom: 12px;
+}
+
+/* Blur Mask */
+.locked-blur-area {
+    filter: blur(4px);
+    opacity: 0.3;
+    pointer-events: none;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: var(--transition-smooth);
+}
+
+/* Floating Lock WTP Call-to-Action Card */
+.lock-floating-card {
+    position: absolute;
+    bottom: 16px; /* Anchor to the bottom safely */
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px); /* Spans parent content area perfectly with equal 16px safety margins */
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(26, 35, 126, 0.08);
+    border-radius: 20px;
+    padding: 18px 16px;
+    box-shadow: 0 12px 30px rgba(26, 35, 126, 0.16);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 5;
+}
+
+.lock-badge-icon {
+    font-size: 32px;
+    filter: drop-shadow(0 2px 4px rgba(26, 35, 126, 0.15));
+}
+
+.lock-card-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.lock-card-desc {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* Pulsing premium unlock button */
+.btn-premium-unlock {
+    width: 100%;
+    background: linear-gradient(135deg, #1A237E 0%, #0D47A1 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    color: #FFFFFF;
+    font-size: 11.5px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    animation: premium-pulse 2s infinite;
+}
+
+.btn-premium-unlock:hover {
+    transform: scale(1.02);
+}
+
+@keyframes premium-pulse {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(26, 35, 126, 0.35);
+    }
+    50% {
+        box-shadow: 0 4px 24px rgba(66, 165, 245, 0.65);
+        transform: scale(1.01);
+    }
+}
+
+/* Mock Shopping Curation Cords */
+.mock-shop-card {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.mock-shop-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mock-shop-emoji {
+    font-size: 20px;
+}
+
+.mock-shop-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-navy);
+}
+
+.mock-shop-mall {
+    font-size: 9px;
+    background: #EEEEEE;
+    color: #666666;
+    padding: 2px 6px;
+    border-radius: 6px;
+    margin-left: 6px;
+    font-weight: 700;
+}
+
+.mock-shop-right {
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+/* ==========================================================================
+   Fake Door Test Modal Overlay & Card
+   ========================================================================== */
+
+.fake-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(13, 27, 42, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+    overflow-y: auto; /* Enable vertical scroll if viewport height is small */
+    padding: 20px 0;  /* Vertically cushion scroll boundary */
+}
+
+.fake-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.fake-modal-card {
+    width: 86%;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: var(--glass-border);
+    border-radius: 28px;
+    padding: 26px 20px;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fake-modal-overlay.active .fake-modal-card {
+    transform: translateY(0);
+}
+
+.fake-badge-icon {
+    font-size: 40px;
+    filter: drop-shadow(0 4px 10px rgba(66, 165, 245, 0.3));
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.fake-modal-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.fake-modal-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    background: rgba(26, 35, 126, 0.03);
+    border: 1px dashed rgba(26, 35, 126, 0.1);
+    border-radius: 16px;
+    padding: 12px 14px;
+}
+
+.btn-fake-confirm {
+    width: 100%;
+    background: linear-gradient(135deg, #1A237E 0%, #0D47A1 100%);
+    border: none;
+    border-radius: 14px;
+    padding: 12px;
+    color: #FFFFFF;
+    font-size: 12.5px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
+    transition: var(--transition-smooth);
+}
+
+.btn-fake-confirm:hover {
+    background: #000051;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   My Page / Profile Tab Styles (Phase 5)
+   ========================================================================== */
+
+.profile-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: var(--glass-border);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: var(--glass-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+    animation: slide-in 0.4s ease-out forwards;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.profile-avatar {
+    width: 52px;
+    height: 52px;
+    background: rgba(227, 242, 253, 0.8);
+    border: 1px solid rgba(144, 202, 249, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    box-shadow: 0 4px 10px rgba(142, 172, 205, 0.15);
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.profile-name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.profile-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.profile-badge {
+    background: #E8F5E9;
+    color: #2E7D32;
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(46, 125, 50, 0.15);
+}
+
+.profile-status {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* Experience Bar */
+.profile-level-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 4px;
+}
+
+.profile-level-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.profile-level-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(26, 35, 126, 0.04);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.profile-level-fill {
+    height: 100%;
+    width: 65%; /* Experience level */
+    background: linear-gradient(90deg, #42A5F5 0%, #1A237E 100%);
+    border-radius: 3px;
+}
+
+/* Preference Toggles */
+.section-sub-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-navy);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.preference-toggle-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.toggle-chip {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(26, 35, 126, 0.08);
+    border-radius: 16px;
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 6px rgba(142, 172, 205, 0.04);
+}
+
+.toggle-chip:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-1px);
+}
+
+.toggle-chip.active {
+    background: var(--text-navy);
+    color: #FFFFFF;
+    border-color: var(--text-navy);
+    box-shadow: 0 4px 10px rgba(26, 35, 126, 0.18);
+}
+
+/* My stats Grid (3 columns) */
+.my-stats-grid {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.my-stat-card {
+    flex: 1;
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    border-radius: 16px;
+    padding: 12px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    box-shadow: var(--glass-shadow);
+    text-align: center;
+}
+
+.my-stat-emoji {
+    font-size: 18px;
+}
+
+.my-stat-val {
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.my-stat-label {
+    font-size: 9px;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+/* Roadmap Banner */
+.roadmap-banner {
+    background: rgba(227, 242, 253, 0.4);
+    border: 1px dashed rgba(144, 202, 249, 0.5);
+    border-radius: 16px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.roadmap-icon {
+    font-size: 22px;
+}
+
+.roadmap-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.roadmap-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.roadmap-desc {
+    font-size: 9.5px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+

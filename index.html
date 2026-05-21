@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoEatzy - 냉장고에 뭐 있지? 쉽고 간편하게</title>
+    <!-- Pretendard Web Font CDN -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- Google Fonts Outfit (for numbers & English headers) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- 상단 헤더 영역 -->
+        <header class="app-header">
+            <h1 class="logo">Mo<span>Eatzy</span></h1>
+            <button id="header-scan-btn" class="header-scan-btn" onclick="openScanModal()">
+                <span class="scan-btn-icon">📸</span>
+                <span class="scan-btn-text">스캔 등록</span>
+            </button>
+        </header>
+
+        <!-- 메인 컨텐츠 영역 -->
+        <main id="content" class="app-content">
+            <!-- 화면 내용이 여기에 동적으로 삽입됩니다 -->
+        </main>
+
+        <!-- 하단 고정 탭 바 -->
+        <nav class="tab-bar">
+            <button id="tab-inventory" class="tab-item" onclick="switchTab('inventory')">
+                <span class="tab-icon">🥬</span>
+                <span class="tab-label">인벤토리</span>
+            </button>
+            <button id="tab-recipe" class="tab-item" onclick="switchTab('recipe')">
+                <span class="tab-icon">🍳</span>
+                <span class="tab-label">레시피</span>
+            </button>
+            <button id="tab-shopping" class="tab-item" onclick="switchTab('shopping')">
+                <span class="tab-icon">🛒</span>
+                <span class="tab-label">스마트 바잉</span>
+            </button>
+            <button id="tab-my" class="tab-item" onclick="switchTab('my')">
+                <span class="tab-icon">👤</span>
+                <span class="tab-label">마이</span>
+            </button>
+        </nav>
+    </div>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
