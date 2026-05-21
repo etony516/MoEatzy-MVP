@@ -816,11 +816,9 @@ function renderRecipePage(container) {
                             <span class="recipe-meta-badge" style="${urgencyClass} background: rgba(255,255,255,0.8); border: 1px solid currentColor;">${urgencyText}</span>
                             <span class="recipe-meta-badge">⚡ ${recipe.time}</span>
                             <span class="recipe-meta-badge">🔥 ${recipe.difficulty}</span>
-                            ${recipe.youtubeUrl ? `
-                                <a href="${recipe.youtubeUrl}" target="_blank" rel="noopener noreferrer" class="recipe-meta-badge youtube-link" style="text-decoration: none; background: #FFEBEE; color: #D32F2F; border: 1px solid rgba(211, 47, 47, 0.15); transition: var(--transition-smooth);" onclick="event.stopPropagation()">
-                                    <span>▶️</span> 영상 가이드
-                                </a>
-                            ` : ''}
+                            <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(recipe.title + ' 레시피')}" target="_blank" rel="noopener noreferrer" class="recipe-meta-badge youtube-link" style="text-decoration: none; background: #FFEBEE; color: #D32F2F; border: 1px solid rgba(211, 47, 47, 0.15); transition: var(--transition-smooth);" onclick="event.stopPropagation()">
+                                <span>▶️</span> 영상 가이드
+                            </a>
                         </div>
                     </div>
                     
