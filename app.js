@@ -7,6 +7,71 @@ let currentTab = 'inventory';
 let activeFilter = 'dday'; // 'dday' | 'category' | 'location'
 let isAlreadyScanned = false; // Scan lock flag
 let activeRescueRecipe = null; // Storing active recipe for subtraction
+let tempScanResults = []; // Temporary storage for OCR scanning before final merge
+
+// AI Generator State
+let isAiGenerating = false;
+
+/**
+ * Asynchronously fetch local environment credentials from Environment Variables.md if available
+ */
+async function loadApiKeyFromEnvironmentFile() {
+    try {
+        const res = await fetch('Environment Variables.md');
+        if (res.ok) {
+            const text = await res.text();
+            const match = text.match(/GOOGLE_API_KEY\s*=\s*["']?([^"'\s]+)["']?/);
+            if (match && match[1]) {
+                const apiKey = match[1].trim();
+                window.GOOGLE_API_KEY = apiKey;
+                localStorage.setItem('moeatzy_google_api_key', apiKey);
+                console.log("[MoEatzy AI] Successfully loaded GOOGLE_API_KEY from Environment Variables.md");
+            }
+        }
+    } catch (e) {
+        console.warn("[MoEatzy AI] Could not auto-load Environment Variables.md:", e);
+    }
+}
+
+/**
+ * Retrieve current active GOOGLE_API_KEY from environment variables (window object)
+ * or local storage fallback.
+ */
+function getGoogleApiKey() {
+    return window.GOOGLE_API_KEY || localStorage.getItem('moeatzy_google_api_key') || '';
+}
+
+/**
+ * Retrieve Gemma 4 model priority 1 designation variable
+ */
+function getGemmaModel1() {
+    let model = window.GEMMA_MODEL_PRIORITY_1 || localStorage.getItem('moeatzy_gemma_model_1') || 'gemma-4-31b-it';
+    if (!model || model.includes('gemini') || model === 'gemma-4-31b') {
+        model = 'gemma-4-31b-it';
+    }
+    return model;
+}
+
+/**
+ * Retrieve Gemma 4 model priority 2 designation variable
+ */
+function getGemmaModel2() {
+    let model = window.GEMMA_MODEL_PRIORITY_2 || localStorage.getItem('moeatzy_gemma_model_2') || 'gemma-4-26b-a4b-it';
+    if (!model || model.includes('gemini') || model === 'gemma-4-31b' || model === 'gemma-4-26b' || model === 'gemma-4-31b-it') {
+        model = 'gemma-4-26b-a4b-it';
+    }
+    return model;
+}
+
+/**
+ * Retrieve the active AI engine model text description
+ */
+function getGemmaModel() {
+    return `${getGemmaModel1()} (1순위) | ${getGemmaModel2()} (2순위)`;
+}
+
+
+
 
 /**
  * Switch between bottom navigation tabs
@@ -261,6 +326,21 @@ function initializeDynamicUI() {
                     </div>
                     <span class="progress-pct" id="scanner-progress-pct">0%</span>
                 </div>
+
+                <!-- OCR Verification & Edit View -->
+                <div id="modal-verification-view" class="scan-verification-area" style="display: none;">
+                    <h3 class="modal-title">🧐 AI 인식 결과 검토</h3>
+                    <p class="modal-desc">AI가 분석해낸 식재료 목록입니다. 잘못 인식된 품목이나 유통기한(D-Day)을 자유롭게 수정해 보세요.</p>
+                    
+                    <div id="verif-items-list" class="verif-items-list">
+                        <!-- Dynamically filled with input rows -->
+                    </div>
+                    
+                    <div class="verif-actions-container">
+                        <button class="btn-verif-add" onclick="addTempItem()">➕ 재료 추가</button>
+                        <button class="btn-verif-save" onclick="finalizeScanRegistration()">냉장고에 최종 저장</button>
+                    </div>
+                </div>
             </div>
         </div>
     `;
@@ -314,21 +394,38 @@ function initializeDynamicUI() {
         </div>
     `;
     appEl.insertAdjacentHTML('beforeend', fakeModalHTML);
+
+    // 5. AI Hologram spinner overlay
+    const aiLoadingHTML = `
+        <div id="ai-loading-overlay" class="ai-loading-overlay">
+            <div class="ai-loading-card">
+                <div class="ai-hologram-spinner">
+                    <div class="spinner-ring"></div>
+                    <span class="ai-spinner-icon">✨</span>
+                </div>
+                <h3 class="ai-loading-title">스마트 AI 레시피 추천 중</h3>
+                <p class="ai-loading-desc" id="ai-loading-desc">AI가 냉장고 속 식재료의 영양과 궁합을 분석하여 맞춤 레시피를 설계하고 있습니다...</p>
+                <div class="ai-loading-steps">
+                    <span class="loading-step active" id="step-1">● 식재료 최적 매칭 분석 중</span>
+                    <span class="loading-step" id="step-2">● 15분 조리 가이드 구성 중</span>
+                    <span class="loading-step" id="step-3">● 맞춤형 레시피 완성 중</span>
+                </div>
+            </div>
+        </div>
+    `;
+    appEl.insertAdjacentHTML('beforeend', aiLoadingHTML);
 }
 
 /**
  * Open the Smart Scan Modal
  */
 function openScanModal() {
-    if (isAlreadyScanned) {
-        showToast('이미 냉장고 식재료 스캔이 완료되었습니다!', 'ℹ️');
-        return;
-    }
-
     const overlay = document.getElementById('scan-modal-overlay');
     if (overlay) {
         document.getElementById('modal-initial-view').style.display = 'block';
         document.getElementById('modal-loading-view').style.display = 'none';
+        const verifView = document.getElementById('modal-verification-view');
+        if (verifView) verifView.style.display = 'none';
         
         overlay.classList.add('active');
     }
@@ -389,23 +486,18 @@ function startTechnicalScan(scanType) {
         if (progress >= 100) {
             clearInterval(timer);
             
-            ingredients.push(...mockScanResult);
-            isAlreadyScanned = true;
-
-            const scanBtn = document.getElementById('header-scan-btn');
-            if (scanBtn) {
-                scanBtn.classList.add('scanned');
-                scanBtn.innerHTML = '<span class="scan-btn-icon">✅</span><span class="scan-btn-text">스캔 완료</span>';
-            }
-
+            // Deep-copy mockScanResult into tempScanResults for local correction
+            tempScanResults = JSON.parse(JSON.stringify(mockScanResult));
+            
+            // Smoothly shift to OCR Verification Screen inside the modal
             setTimeout(() => {
-                closeScanModal();
-                
-                if (currentTab === 'inventory') {
-                    renderInventory(document.getElementById('content'));
+                const loadingView = document.getElementById('modal-loading-view');
+                const verificationView = document.getElementById('modal-verification-view');
+                if (loadingView && verificationView) {
+                    loadingView.style.display = 'none';
+                    verificationView.style.display = 'block';
+                    renderScanVerificationScreen();
                 }
-                
-                showToast('장보기 내역 3건이 입력되었습니다! (새송이버섯, 우유, 베이컨)', '🎉');
             }, 300);
         }
     }, intervalTime);
@@ -434,56 +526,329 @@ function showToast(message, icon = '🎉') {
 }
 
 // ==========================================================================
-// Phase 3: AI Recipe Matched Renderer & Confetti Physics Mechanics
+// Phase 2.5: AI OCR Verification & Correction Interaction Logic
 // ==========================================================================
 
 /**
- * Render matched recipes or an elegant empty placeholder
+ * Dynamically match optimal emojis for typed Korean ingredient names
+ * @param {string} name 
+ * @returns {string} Emoji
+ */
+function getEmojiForIngredient(name) {
+    if (!name) return "🏷️";
+    name = name.trim();
+    if (name.includes("대파") || name.includes("쪽파") || name.includes("실파") || name.includes("파")) return "🥬";
+    if (name.includes("양파")) return "🧅";
+    if (name.includes("마늘")) return "🧄";
+    if (name.includes("고추") || name.includes("피망") || name.includes("파프리카")) return "🌶️";
+    if (name.includes("새송이") || name.includes("느타리") || name.includes("팽이") || name.includes("송이") || name.includes("버섯")) return "🍄";
+    if (name.includes("토마토") || name.includes("방울토마토")) return "🍅";
+    if (name.includes("당근")) return "🥕";
+    if (name.includes("감자")) return "🥔";
+    if (name.includes("고구마")) return "🍠";
+    if (name.includes("가지")) return "🍆";
+    if (name.includes("오이")) return "🥒";
+    if (name.includes("호박") || name.includes("애호박") || name.includes("단호박")) return "🎃";
+    if (name.includes("옥수수")) return "🌽";
+    if (name.includes("배추") || name.includes("상추") || name.includes("깻잎") || name.includes("시금치") || name.includes("샐러드") || name.includes("채소")) return "🥬";
+    
+    if (name.includes("계란") || name.includes("달걀") || name.includes("메추리알")) return "🥚";
+    if (name.includes("우유") || name.includes("두유")) return "🥛";
+    if (name.includes("치즈") || name.includes("체다") || name.includes("모짜렐라")) return "🧀";
+    if (name.includes("두부") || name.includes("순두부") || name.includes("연두부")) return "🧈";
+    if (name.includes("버터") || name.includes("마가린")) return "🧈";
+    if (name.includes("요거트") || name.includes("요구르트")) return "🥛";
+
+    if (name.includes("베이컨")) return "🥓";
+    if (name.includes("삼겹살") || name.includes("목살") || name.includes("돼지") || name.includes("돈")) return "🐖";
+    if (name.includes("소고기") || name.includes("등심") || name.includes("안심") || name.includes("우육")) return "🐂";
+    if (name.includes("닭고기") || name.includes("닭") || name.includes("치킨") || name.includes("닭가슴살")) return "🐔";
+    if (name.includes("햄") || name.includes("소시지") || name.includes("스팸") || name.includes("고기") || name.includes("스테이크")) return "🥩";
+    
+    if (name.includes("새우") || name.includes("대하")) return "🍤";
+    if (name.includes("연어")) return "🐟";
+    if (name.includes("참치") || name.includes("동원참치") || name.includes("캔참치")) return "🐟";
+    if (name.includes("오징어") || name.includes("문어") || name.includes("낙지") || name.includes("쭈꾸미")) return "🦑";
+    if (name.includes("생선") || name.includes("고등어") || name.includes("갈치") || name.includes("조기")) return "🐟";
+    if (name.includes("조개") || name.includes("바지락") || name.includes("홍합") || name.includes("굴")) return "🐚";
+    
+    if (name.includes("사과")) return "🍎";
+    if (name.includes("바나나")) return "🍌";
+    if (name.includes("포도") || name.includes("샤인머스캣")) return "🍇";
+    if (name.includes("딸기")) return "🍓";
+    if (name.includes("레몬")) return "🍋";
+    if (name.includes("오렌지") || name.includes("귤") || name.includes("한라봉")) return "🍊";
+    if (name.includes("수박")) return "🍉";
+    if (name.includes("파인애플")) return "🍍";
+    if (name.includes("참외") || name.includes("멜론")) return "🍈";
+    if (name.includes("복숭아")) return "🍑";
+
+    return "🏷️";
+}
+
+/**
+ * Automap categories for dynamic inventory allocation based on name rules
+ * @param {string} name 
+ * @returns {string} Category string
+ */
+function getCategoryForIngredient(name) {
+    if (!name) return "기타";
+    name = name.trim();
+    if (name.includes("파") || name.includes("양파") || name.includes("마늘") || name.includes("버섯") || name.includes("토마토") || name.includes("당근") || name.includes("감자") || name.includes("고구마") || name.includes("가지") || name.includes("오이") || name.includes("호박") || name.includes("애호박") || name.includes("배추") || name.includes("상추") || name.includes("깻잎") || name.includes("샐러드") || name.includes("시금치")) {
+        return "채소";
+    }
+    if (name.includes("계란") || name.includes("달걀") || name.includes("우유") || name.includes("치즈") || name.includes("요거트") || name.includes("버터")) {
+        return "알류/유제품";
+    }
+    if (name.includes("삼겹살") || name.includes("소고기") || name.includes("닭고기") || name.includes("닭") || name.includes("베이컨") || name.includes("고기") || name.includes("햄") || name.includes("소시지") || name.includes("스팸")) {
+        return "육류";
+    }
+    if (name.includes("새우") || name.includes("생선") || name.includes("고등어") || name.includes("연어") || name.includes("참치") || name.includes("오징어") || name.includes("조개")) {
+        return "수산물";
+    }
+    if (name.includes("두부") || name.includes("순두부") || name.includes("연두부") || name.includes("두유")) {
+        return "두부/콩류";
+    }
+    if (name.includes("사과") || name.includes("바나나") || name.includes("포도") || name.includes("딸기") || name.includes("오렌지") || name.includes("귤") || name.includes("수박")) {
+        return "과일";
+    }
+    return "기타";
+}
+
+/**
+ * Renders the OCR recognized items for confirmation and live edit
+ */
+function renderScanVerificationScreen() {
+    const listEl = document.getElementById('verif-items-list');
+    if (!listEl) return;
+    
+    listEl.innerHTML = '';
+    
+    if (tempScanResults.length === 0) {
+        listEl.innerHTML = `
+            <div class="verif-empty-state">
+                <span class="empty-emoji">🥣</span>
+                <p>인식된 식재료가 없습니다.<br>아래의 '재료 추가' 버튼을 눌러 직접 등록해보세요!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    tempScanResults.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'verification-item-row';
+        row.innerHTML = `
+            <span class="verif-item-emoji" id="verif-emoji-${index}">${item.emoji || '🏷️'}</span>
+            <input type="text" class="verif-input-name" value="${item.name}" placeholder="예: 새송이버섯" oninput="updateTempItemName(${index}, this.value)" />
+            <div class="verif-dday-wrapper">
+                <input type="number" class="verif-input-dday" value="${item.dday}" min="1" max="99" oninput="updateTempItemDday(${index}, this.value)" />
+                <span class="verif-dday-label">D-Day</span>
+            </div>
+            <button class="btn-verif-delete" onclick="deleteTempItem(${index})" title="삭제">🗑️</button>
+        `;
+        listEl.appendChild(row);
+    });
+}
+
+/**
+ * Handler for editing the ingredient name and automatically updating its emoji & category
+ */
+function updateTempItemName(index, val) {
+    if (tempScanResults[index]) {
+        tempScanResults[index].name = val;
+        
+        // Auto-match emoji and category
+        const matchedEmoji = getEmojiForIngredient(val);
+        tempScanResults[index].emoji = matchedEmoji;
+        tempScanResults[index].category = getCategoryForIngredient(val);
+        
+        // Live update the emoji container on screen without rendering the whole list to keep cursor focus
+        const emojiEl = document.getElementById(`verif-emoji-${index}`);
+        if (emojiEl) {
+            emojiEl.innerText = matchedEmoji;
+        }
+    }
+}
+
+/**
+ * Handler for editing the remaining D-Day
+ */
+function updateTempItemDday(index, val) {
+    if (tempScanResults[index]) {
+        let d = parseInt(val, 10);
+        if (isNaN(d) || d < 0) d = 0;
+        tempScanResults[index].dday = d;
+    }
+}
+
+/**
+ * Deletes an item from temporary list
+ */
+function deleteTempItem(index) {
+    tempScanResults.splice(index, 1);
+    renderScanVerificationScreen();
+}
+
+/**
+ * Adds a new default item row to the temporary list
+ */
+function addTempItem() {
+    tempScanResults.push({
+        name: "새로운 재료",
+        dday: 5,
+        category: "기타",
+        location: "냉장실",
+        emoji: "🏷️"
+    });
+    renderScanVerificationScreen();
+}
+
+/**
+ * Confirms registration of verified temp results and pushes them to inventory
+ */
+function finalizeScanRegistration() {
+    if (tempScanResults.length === 0) {
+        showToast('저장할 식재료가 없습니다. 재료를 추가해주세요!', '⚠️');
+        return;
+    }
+    
+    // Check if name is blank
+    const blankItemIndex = tempScanResults.findIndex(item => !item.name || item.name.trim() === '');
+    if (blankItemIndex !== -1) {
+        showToast('식재료 이름을 올바르게 입력해주세요!', '⚠️');
+        return;
+    }
+    
+    // Final save: push to master ingredients array
+    ingredients.push(...tempScanResults);
+    
+    // Spawn gorgeous Confetti falling shards from AI rescue success style
+    triggerConfetti();
+    
+    // Close modal
+    closeScanModal();
+    
+    // Refresh Inventory View if currently active
+    if (currentTab === 'inventory') {
+        const contentArea = document.getElementById('content');
+        renderInventory(contentArea);
+    }
+    
+    // Alert with Toast
+    const savedNamesStr = tempScanResults.map(item => item.name.trim()).join(', ');
+    showToast(`식재료 ${tempScanResults.length}건이 냉장고에 수납되었습니다! (${savedNamesStr})`, '🎉');
+}
+
+/**
+ * Render the AI Recipe screen with collapsible cards
+ * @param {HTMLElement} container 
+ */
+/**
+ * Render the AI Recipe screen with collapsible cards
  * @param {HTMLElement} container 
  */
 function renderRecipePage(container) {
+    const aiGeneratorHTML = `
+        <div class="ai-button-wrapper" style="margin-bottom: 24px;">
+            <button class="btn-ai-generate" onclick="generateAIRecipe()">
+                <span>✨</span> AI 활용하여 레시피 추천받기
+            </button>
+        </div>
+    `;
+
     const headerHTML = `
         <h2 class="page-title">AI 현실형 레시피</h2>
         <p class="page-subtitle">냉장고에 부재료 매수 없이, 오직 현재 있는 식재료만으로 100% 만드는 15분 식탁.</p>
     `;
-
-    // 1. Scan available matching recipes
+    
+    // Filter recipes that can be made with current ingredients
     const matchedRecipes = recipes.filter(recipe => {
-        return recipe.ingredients.every(reqName => {
-            return ingredients.some(myIng => myIng.name === reqName);
-        });
+        return recipe.ingredients.every(reqName => ingredients.some(myIng => myIng.name === reqName));
+    });
+    
+    // Sort recipes by the minimum dday of their required ingredients (ascending - most urgent first)
+    const sortedRecipes = [...matchedRecipes].sort((a, b) => {
+        const getMinDday = (recipe) => {
+            const ddays = recipe.ingredients.map(ingName => {
+                const matched = ingredients.find(i => i.name === ingName);
+                return matched ? matched.dday : 999;
+            });
+            return Math.min(...ddays);
+        };
+        return getMinDday(a) - getMinDday(b);
     });
 
     let listHTML = '';
-
-    if (matchedRecipes.length === 0) {
+    if (sortedRecipes.length === 0) {
         listHTML = `
             <div class="placeholder-container" style="min-height: 250px; margin-top: 10px;">
                 <span class="placeholder-icon">🥣</span>
                 <h3 class="placeholder-title">구출 가능한 레시피가 없습니다</h3>
-                <p class="placeholder-desc">현재 보유 중인 재료(대파, 계란 등)가 소모되어 조리 가능한 요리가 없습니다. 상단 스캔 버튼을 눌러 새 식재료를 채워보세요!</p>
+                <p class="placeholder-desc">현재 보유 중인 재료가 소모되어 조리 가능한 요리가 없습니다. 상단 스캔 버튼을 눌러 새 식재료를 채워보세요!</p>
             </div>
         `;
     } else {
         listHTML = `<div class="recipe-list">`;
-        matchedRecipes.forEach((recipe, rIdx) => {
+        sortedRecipes.forEach((recipe, rIdx) => {
+            const recipeDdays = recipe.ingredients.map(ingName => {
+                const matched = ingredients.find(i => i.name === ingName);
+                return matched ? matched.dday : 999;
+            });
+            const minDdayVal = Math.min(...recipeDdays);
+            
+            let urgencyText = '🥬 신선함 유지 중';
+            let urgencyClass = 'color: #2E7D32;';
+            if (minDdayVal <= 1) {
+                urgencyText = '🚨 즉시 구출 필요';
+                urgencyClass = 'color: #C62828;';
+            } else if (minDdayVal <= 3) {
+                urgencyText = '⚠️ 오늘 구출 권장';
+                urgencyClass = 'color: #F57F17;';
+            }
+
             listHTML += `
-                <div class="recipe-card" style="animation-delay: ${rIdx * 0.1}s">
+                <div class="recipe-card collapsed" id="recipe-card-${rIdx}" onclick="toggleRecipeCard(${rIdx})" style="animation-delay: ${rIdx * 0.1}s">
                     <div class="recipe-card-header">
                         <span class="recipe-title">${recipe.title}</span>
                         <div class="recipe-meta-badges">
+                            <span class="recipe-meta-badge" style="${urgencyClass} background: rgba(255,255,255,0.8); border: 1px solid currentColor;">${urgencyText}</span>
                             <span class="recipe-meta-badge">⚡ ${recipe.time}</span>
                             <span class="recipe-meta-badge">🔥 ${recipe.difficulty}</span>
+                            ${recipe.youtubeUrl ? `
+                                <a href="${recipe.youtubeUrl}" target="_blank" rel="noopener noreferrer" class="recipe-meta-badge youtube-link" style="text-decoration: none; background: #FFEBEE; color: #D32F2F; border: 1px solid rgba(211, 47, 47, 0.15); transition: var(--transition-smooth);" onclick="event.stopPropagation()">
+                                    <span>▶️</span> 영상 가이드
+                                </a>
+                            ` : ''}
                         </div>
                     </div>
                     
                     <div class="recipe-ingredients-required">
-                        <span class="recipe-ing-title">구출 대상 식재료</span>
-                        ${recipe.ingredients.map(ingName => {
-                            const matchedIng = ingredients.find(i => i.name === ingName);
-                            const emoji = matchedIng ? matchedIng.emoji : '🥬';
-                            return `<span class="recipe-ing-tag">${emoji} ${ingName}</span>`;
-                        }).join('')}
+                        <span class="recipe-ing-title">구출 대상 식재료 (유통기한 임박순 정렬)</span>
+                        ${recipe.ingredients
+                            .map(ingName => ingredients.find(i => i.name === ingName))
+                            .filter(ing => ing !== undefined)
+                            .sort((a, b) => a.dday - b.dday) // Sort individual ingredient tags inside card by D-day
+                            .map(matchedIng => {
+                                const emoji = matchedIng.emoji;
+                                const name = matchedIng.name;
+                                const dday = matchedIng.dday;
+                                
+                                // Color variables aligned with design system
+                                let tagStyle = 'background: #E8F5E9; color: #2E7D32; border: 1px solid rgba(46, 125, 50, 0.15);'; // Safe
+                                if (dday <= 1) {
+                                    tagStyle = 'background: #FFEBEE; color: #C62828; border: 1px solid rgba(198, 40, 40, 0.2); font-weight: 700;';
+                                } else if (dday <= 3) {
+                                    tagStyle = 'background: #FFF8E1; color: #F57F17; border: 1px solid rgba(245, 127, 23, 0.2); font-weight: 700;';
+                                }
+                                
+                                return `
+                                    <span class="recipe-ing-tag" style="${tagStyle} display: inline-flex; align-items: center; gap: 4px;">
+                                        <span>${emoji}</span>
+                                        <span>${name}</span>
+                                        <span style="font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 4px; background: rgba(255,255,255,0.6); margin-left: 2px;">D-${dday}</span>
+                                    </span>
+                                `;
+                            }).join('')}
                     </div>
 
                     <div class="recipe-steps-container">
@@ -497,12 +862,19 @@ function renderRecipePage(container) {
                     </div>
 
                     <div class="recipe-action-bar">
-                        <button class="btn-rescue-success" onclick="executeRescue('${recipe.title}')">
-                            🎉 식재료 구출 성공 (취식)
+                        <button class="btn-rescue-success" onclick="event.stopPropagation(); executeRescue('${recipe.title}')">
+                            🎉 식재료 구출 성공
                         </button>
-                        <button class="btn-rescue-fail" onclick="executeDiscard('${recipe.title}')">
-                            🗑️ 구출 실패 (폐기)
+                        <button class="btn-rescue-fail" onclick="event.stopPropagation(); executeDiscard('${recipe.title}')">
+                            🗑️ 구출 실패
                         </button>
+                        <button class="btn-recipe-share" onclick="event.stopPropagation(); showToast('레시피 공유 링크가 복사되었습니다!', '🔗')">
+                            📤 공유
+                        </button>
+                    </div>
+
+                    <div class="recipe-expand-indicator">
+                        <span class="indicator-arrow">▼</span>
                     </div>
                 </div>
             `;
@@ -510,7 +882,254 @@ function renderRecipePage(container) {
         listHTML += `</div>`;
     }
 
-    container.innerHTML = headerHTML + listHTML;
+    container.innerHTML = headerHTML + aiGeneratorHTML + listHTML;
+}
+
+/**
+ * Extract raw JSON string from a potentially decorated conversational response text
+ * @param {string} text 
+ * @returns {string}
+ */
+function extractJsonText(text) {
+    if (!text) return '';
+    
+    let jsonText = '';
+    
+    // 1. Try to find content inside ```json ... ``` code blocks
+    const markdownRegex = /```json\s*([\s\S]*?)\s*```/i;
+    let match = markdownRegex.exec(text);
+    if (match && match[1]) {
+        jsonText = match[1].trim();
+    } else {
+        // 2. Try generic code block ``` ... ```
+        const genericCodeRegex = /```\s*([\s\S]*?)\s*```/;
+        match = genericCodeRegex.exec(text);
+        if (match && match[1]) {
+            jsonText = match[1].trim();
+        } else {
+            // 3. Find the first '{' and last '}' to extract the raw JSON object
+            const jsonRegex = /(\{[\s\S]*\})/i;
+            match = jsonRegex.exec(text);
+            if (match && match[1]) {
+                jsonText = match[1].trim();
+            } else {
+                jsonText = text.trim();
+            }
+        }
+    }
+    
+    // Perform ultra-resilient sanitization on the extracted JSON block
+    // Split into lines to target specific malformations without breaking string contents
+    let lines = jsonText.split('\n');
+    let cleanedLines = lines.map(line => {
+        let trimmed = line.trim();
+        
+        // A. Remove bullet points or asterisks starting a line before JSON constructs (e.g. * "ingredients" or - [ )
+        if (/^[*\-]+\s*(["{\[\]])/.test(trimmed)) {
+            line = line.replace(/(\s*)[*\-]+\s*/, '$1');
+        }
+        
+        // B. Remove inline comma bullet points (e.g. , * "step" )
+        if (/,\s*[*\-]+\s*(["{\[\]])/.test(line)) {
+            line = line.replace(/,\s*[*\-]+\s*(["{\[\]])/, ', $1');
+        }
+        
+        // C. Remove markdown bolding wrapper asterisks around quoted keys (e.g. **"ingredients"**: )
+        line = line.replace(/\*+(".*?")\*+:/g, '$1:');
+        
+        return line;
+    });
+    
+    return cleanedLines.join('\n');
+}
+
+/**
+ * AI Realtime Recipe Generation Triggering
+ * Calling Vertex/Gemini Google AI API Studio and parsing strictly formatted JSON schemas
+ */
+async function generateAIRecipe() {
+    const apiKey = getGoogleApiKey();
+    const model1 = getGemmaModel1();
+    const model2 = getGemmaModel2();
+    if (!apiKey) {
+        showToast('AI 레시피 추천 기능을 현재 사용할 수 없습니다.', '⚠️');
+        return;
+    }
+    
+    const currentIngs = ingredients.map(i => i.name);
+    if (currentIngs.length === 0) {
+        showToast('냉장고가 비어있어 레시피를 생성할 수 없습니다!', '⚠️');
+        return;
+    }
+    
+    // Show AI Loading holographic overlay screen
+    const overlay = document.getElementById('ai-loading-overlay');
+    if (overlay) overlay.classList.add('active');
+    
+    const descEl = document.getElementById('ai-loading-desc');
+    const step1 = document.getElementById('step-1');
+    const step2 = document.getElementById('step-2');
+    const step3 = document.getElementById('step-3');
+    
+    // Animate loading subtitle phases sequentially
+    let phase = 0;
+    const interval = setInterval(() => {
+        phase = (phase + 1) % 3;
+        if (phase === 0) {
+            if (step3) step3.classList.remove('active');
+            if (step1) step1.classList.add('active');
+            if (descEl) descEl.innerText = "AI가 냉장고 속 식재료의 영양과 궁합을 분석하여 맞춤 레시피를 설계하고 있습니다...";
+        } else if (phase === 1) {
+            if (step1) step1.classList.remove('active');
+            if (step2) step2.classList.add('active');
+            if (descEl) descEl.innerText = "AI가 최적의 식재료 소요 시간 및 조리 가이드를 구성하고 있습니다...";
+        } else if (phase === 2) {
+            if (step2) step2.classList.remove('active');
+            if (step3) step3.classList.add('active');
+            if (descEl) descEl.innerText = "가장 맛있고 실현 가능한 레시피를 다듬어 완성하는 중입니다...";
+        }
+    }, 2000);
+    
+    const prompt = `냉장고 속 재료 목록: [${currentIngs.join(', ')}]
+    
+    위의 재료들만으로 100% 매칭할 수 있고 조리가 가능한 15분 현실형 꿀맛 요리 레시피를 1개 창조해줘.
+    반드시 위의 제공된 재료들을 메인으로 사용하고, 제공되지 않은 다른 부재료를 필수 주재료로 강제하지 마. (소금, 식용유, 간장, 밥 같은 기본 조미료/기본 재료 정도는 부차적으로 쓸 수 있음)
+    
+    반드시 정확히 아래 명시된 JSON 포맷 1개만 반환해줘. 마크다운 기호 없이 순수 JSON만 반환하거나, 마크다운 \`\`\`json 블록으로 감싸서 보내줘.
+    
+    JSON Schema:
+    {
+      "title": "요리명 (예: 초간단 파양파 계란볶음밥)",
+      "ingredients": ["레시피에 사용된 냉장고 식재료들 중 매칭되는 정확한 이름들의 문자열 배열 (예: 대파, 계란 등)"],
+      "time": "조리시간 (예: 12분)",
+      "difficulty": "난이도 (예: 쉬움 / 보통 / 어려움 중 택1)",
+      "steps": [
+        "조리 단계 1 (간결한 한국어)",
+        "조리 단계 2",
+        "조리 단계 3",
+        "조리 단계 4 (최대 5단계)"
+      ]
+    }
+    
+    주의: 요리명 앞이나 제목에 '[AI]'와 같은 수식어는 직접 붙이지 마. 프로그램이 알아서 붙여줄게.`;
+    
+    const payload = {
+        contents: [{
+            parts: [{
+                text: prompt
+            }]
+        }],
+        generationConfig: {
+            responseMimeType: "application/json"
+        }
+    };
+    
+    const modelCandidates = [
+        { modelName: model1, name: `${model1} (1순위)` },
+        { modelName: model2, name: `${model2} (2순위)` }
+    ];
+    
+    let response = null;
+    let lastError = null;
+    let successfulModelName = '';
+
+    try {
+        for (const candidate of modelCandidates) {
+            try {
+                console.log(`[MoEatzy AI] Actively requesting model: ${candidate.name}`);
+                const candidateUrl = `https://generativelanguage.googleapis.com/v1beta/models/${candidate.modelName}:generateContent?key=${apiKey}`;
+                
+                response = await fetch(candidateUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (response.ok) {
+                    successfulModelName = candidate.name;
+                    console.log(`[MoEatzy AI] Success! Connected via: ${successfulModelName}`);
+                    break;
+                } else {
+                    let errMsg = `HTTP Error! Status: ${response.status}`;
+                    try {
+                        const errData = await response.json();
+                        if (errData && errData.error && errData.error.message) {
+                            errMsg = `${response.status} - ${errData.error.message}`;
+                        }
+                    } catch (e) {}
+                    console.warn(`[MoEatzy AI] Model failed for ${candidate.name}: ${errMsg}`);
+                    lastError = new Error(errMsg);
+                }
+            } catch (fetchErr) {
+                console.warn(`[MoEatzy AI] Fetch error for ${candidate.name}:`, fetchErr);
+                lastError = fetchErr;
+            }
+        }
+
+        if (!response || !response.ok) {
+            throw lastError || new Error("AI 서비스 연동 중 오류가 발생했습니다. 키 설정을 다시 확인해 주세요.");
+        }
+        
+        const data = await response.json();
+        clearInterval(interval);
+        
+        let responseText = '';
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
+            responseText = data.candidates[0].content.parts[0].text;
+        } else {
+            throw new Error('API 응답 형식이 올바르지 않습니다.');
+        }
+        
+        // Resiliently extract only the JSON block out of any conversational or markdown responses
+        const jsonText = extractJsonText(responseText);
+        
+        const aiRecipeObj = JSON.parse(jsonText);
+        
+        // Add dynamic YouTube Search URL for bulletproof integration
+        aiRecipeObj.youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(aiRecipeObj.title)}`;
+        
+        // Push to global recipes array
+        recipes.unshift(aiRecipeObj);
+        
+        // Clear Loading Overlay
+        if (overlay) overlay.classList.remove('active');
+        
+        // Confetti physics particles triggering
+        triggerConfetti();
+        
+        // Refresh Recipe View to mount new card dynamically
+        if (currentTab === 'recipe') {
+            const contentArea = document.getElementById('content');
+            renderRecipePage(contentArea);
+        }
+        
+        showToast(`AI 실시간 레시피가 창조되었습니다: ${aiRecipeObj.title}`, '✨');
+        
+    } catch (err) {
+        console.error('[AI RECIPE COMPONENT ERROR] 생성 실패:', err);
+        clearInterval(interval);
+        if (overlay) overlay.classList.remove('active');
+        showToast(`오류: ${err.message}`, '❌');
+    }
+}
+
+/**
+ * Toggles a recipe card's collapsed/expanded state
+ * @param {number} rIdx 
+ */
+function toggleRecipeCard(rIdx) {
+    const card = document.getElementById(`recipe-card-${rIdx}`);
+    if (!card) return;
+    
+    if (card.classList.contains('collapsed')) {
+        card.classList.remove('collapsed');
+        card.classList.add('expanded');
+    } else {
+        card.classList.add('collapsed');
+        card.classList.remove('expanded');
+    }
 }
 
 /**
@@ -612,8 +1231,11 @@ function executeDiscard(recipeTitle) {
 }
 
 // Initial App Bootstrapping
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     console.log('[MoEatzy] App bootstrap initialized.');
+    
+    // Auto-load key from local Markdown environment file if available
+    await loadApiKeyFromEnvironmentFile();
     
     // Build Phase 2 & 3 Modals/Overlays dynamically
     initializeDynamicUI();

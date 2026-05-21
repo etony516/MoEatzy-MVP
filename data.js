@@ -18,6 +18,7 @@ const recipes = [
         ingredients: ["대파", "계란"],
         time: "10분",
         difficulty: "쉬움",
+        youtubeUrl: "https://www.youtube.com/watch?v=1F_47ZfXvJ0", // 하루한끼 초간단 계란볶음밥 (24M+ 조회수 보장 실시간 영상)
         steps: [
             "대파를 송송 썰어 기름에 볶아 파기름을 냅니다.",
             "풀어둔 계란을 한쪽에 부어 스크램블 에그를 만듭니다.",
@@ -30,6 +31,7 @@ const recipes = [
         ingredients: ["양파", "새송이버섯", "우유", "베이컨"],
         time: "15분",
         difficulty: "보통",
+        youtubeUrl: "https://www.youtube.com/watch?v=H74tSgu-p0I", // 백종원 공식 요리비책 - 생크림 없이 우유로 만드는 초간단 크림파스타 실시간 영상
         steps: [
             "파스타면을 끓는 물에 소금을 넣고 8분간 삶아 건져둡니다.",
             "양파, 새송이버섯, 베이컨을 한 입 크기로 채 썰어둡니다.",

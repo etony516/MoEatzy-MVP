@@ -741,19 +741,25 @@ body {
 
 .recipe-card-header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column; /* Stack vertically to accommodate long recipe titles on mobile viewports */
+    gap: 8px;
     align-items: flex-start;
+    width: 100%;
 }
 
 .recipe-title {
     font-size: 17px;
     font-weight: 800;
     color: var(--text-navy);
+    line-height: 1.35;
+    word-break: keep-all; /* Elegant word-wrapping in Korean typography */
 }
 
 .recipe-meta-badges {
     display: flex;
+    flex-wrap: wrap; /* Gracefully wrap badges (Time, Difficulty, YouTube) on small screens */
     gap: 6px;
+    width: 100%;
 }
 
 .recipe-meta-badge {
@@ -766,6 +772,16 @@ body {
     display: flex;
     align-items: center;
     gap: 3px;
+}
+
+.recipe-meta-badge.youtube-link {
+    transition: var(--transition-smooth);
+}
+
+.recipe-meta-badge.youtube-link:hover {
+    background-color: #FFCDD2 !important;
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 10px rgba(211, 47, 47, 0.2);
 }
 
 /* Matching Ingredient Tags */
@@ -897,6 +913,30 @@ body {
     background: rgba(198, 40, 40, 0.05);
     border-color: rgba(198, 40, 40, 0.3);
     color: #C62828;
+}
+
+.btn-recipe-share {
+    background: transparent;
+    border: 1px solid rgba(26, 35, 126, 0.15);
+    border-radius: 12px;
+    padding: 12px;
+    color: var(--text-navy);
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: var(--transition-smooth);
+}
+
+.btn-recipe-share:hover {
+    background: rgba(26, 35, 126, 0.05);
+    border-color: rgba(26, 35, 126, 0.3);
+    color: var(--text-navy);
+    transform: translateY(-1px);
 }
 
 /* ==========================================================================
@@ -1635,4 +1675,615 @@ body {
     color: var(--text-muted);
     line-height: 1.4;
 }
+
+/* ==========================================================================
+   AI Smart Scan OCR Verification & Edit Screen
+   ========================================================================== */
+
+.scan-verification-area {
+    margin-top: 10px;
+    width: 100%;
+}
+
+.verif-items-list {
+    max-height: 220px;
+    overflow-y: auto;
+    margin: 15px 0;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Custom Scrollbar for verified items list */
+.verif-items-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.verif-items-list::-webkit-scrollbar-track {
+    background: rgba(26, 35, 126, 0.05);
+    border-radius: 10px;
+}
+
+.verif-items-list::-webkit-scrollbar-thumb {
+    background: rgba(26, 35, 126, 0.15);
+    border-radius: 10px;
+}
+
+.verif-items-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(26, 35, 126, 0.3);
+}
+
+.verification-item-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 14px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 12px rgba(26, 35, 126, 0.03);
+    transition: var(--transition-smooth);
+}
+
+.verification-item-row:hover {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(30, 136, 229, 0.2);
+    box-shadow: 0 6px 16px rgba(26, 35, 126, 0.06);
+}
+
+.verif-item-emoji {
+    font-size: 18px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(26, 35, 126, 0.08);
+}
+
+.verif-input-name {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid rgba(26, 35, 126, 0.1);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-navy);
+    transition: all 0.2s ease;
+}
+
+.verif-input-name:focus {
+    outline: none;
+    border-color: #1E88E5;
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.15);
+}
+
+.verif-dday-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(26, 35, 126, 0.1);
+    border-radius: 10px;
+    padding: 4px 8px;
+}
+
+.verif-input-dday {
+    width: 24px;
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 800;
+    color: #E53935;
+    text-align: center;
+    font-family: 'Outfit', sans-serif;
+}
+
+.verif-input-dday:focus {
+    outline: none;
+}
+
+/* Hide chrome/safari arrow spinner */
+.verif-input-dday::-webkit-outer-spin-button,
+.verif-input-dday::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Hide firefox spinner */
+.verif-input-dday {
+    -moz-appearance: textfield;
+}
+
+.verif-dday-label {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-muted);
+}
+
+.btn-verif-delete {
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-verif-delete:hover {
+    background: rgba(229, 57, 53, 0.08);
+    transform: scale(1.08);
+}
+
+.verif-actions-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.btn-verif-add {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1.5px dashed rgba(26, 35, 126, 0.25);
+    border-radius: 14px;
+    padding: 11px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-navy);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.btn-verif-add:hover {
+    background: rgba(26, 35, 126, 0.04);
+    border-color: #1E88E5;
+    color: #1E88E5;
+}
+
+.btn-verif-save {
+    flex: 1.8;
+    background: linear-gradient(135deg, #1E88E5, #1565C0);
+    border: none;
+    border-radius: 14px;
+    padding: 11px;
+    font-size: 12px;
+    font-weight: 800;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    box-shadow: 0 4px 12px rgba(21, 101, 192, 0.2);
+}
+
+.btn-verif-save:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 16px rgba(21, 101, 192, 0.3);
+}
+
+.btn-verif-save:active {
+    transform: translateY(0);
+}
+
+.verif-empty-state {
+    padding: 36px 12px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px dashed rgba(26, 35, 126, 0.15);
+    border-radius: 16px;
+    color: var(--text-muted);
+}
+
+.verif-empty-state .empty-emoji {
+    font-size: 26px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.verif-empty-state p {
+    font-size: 11px;
+    line-height: 1.6;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   Accordion Collapsible Recipe Cards
+   ========================================================================== */
+
+.recipe-card.collapsed {
+    cursor: pointer;
+    transition: background var(--transition-smooth), transform var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.recipe-card.collapsed:hover {
+    background: rgba(255, 255, 255, 0.7);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(142, 172, 205, 0.15);
+}
+
+/* Hide collapsible content by default when collapsed */
+.recipe-card.collapsed .recipe-steps-container,
+.recipe-card.collapsed .recipe-action-bar {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+    transition: max-height 0.3s cubic-bezier(0, 1, 0, 1), opacity 0.2s ease, margin 0.3s ease;
+}
+
+.recipe-card.expanded .recipe-steps-container {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 8px;
+    transition: max-height 0.4s ease-in, opacity 0.3s ease 0.1s;
+}
+
+.recipe-card.expanded .recipe-action-bar {
+    max-height: 100px;
+    opacity: 1;
+    margin-top: 14px;
+    transition: max-height 0.4s ease-in, opacity 0.3s ease 0.1s;
+}
+
+/* Expand indicator styling */
+.recipe-expand-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(26, 35, 126, 0.08);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    gap: 4px;
+    cursor: pointer;
+    transition: color var(--transition-smooth);
+}
+
+.recipe-card.collapsed:hover .recipe-expand-indicator {
+    color: var(--text-navy);
+}
+
+.recipe-expand-indicator .indicator-arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 10px;
+}
+
+.recipe-card.expanded .recipe-expand-indicator .indicator-arrow {
+    transform: rotate(180deg);
+}
+
+.recipe-expand-indicator::before {
+    content: '상세 레시피 펼치기';
+}
+
+.recipe-card.expanded .recipe-expand-indicator::before {
+    content: '레시피 접기';
+}
+
+/* ==========================================================================
+   AI Smart Recipe & My Page Settings Styles
+   ========================================================================== */
+
+/* AI settings panel for My Page */
+.ai-settings-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: var(--glass-border);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: var(--glass-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+    animation: slide-in 0.4s ease-out forwards;
+}
+
+.ai-settings-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ai-settings-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.ai-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.ai-settings-input {
+    width: 100%;
+    border: 1px solid rgba(26, 35, 126, 0.1);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-navy);
+    transition: all 0.2s ease;
+}
+
+.ai-settings-input:focus {
+    outline: none;
+    border-color: #1E88E5;
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.15);
+}
+
+.ai-settings-input:disabled {
+    background: rgba(26, 35, 126, 0.03);
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+.btn-ai-settings-save {
+    width: 100%;
+    background: linear-gradient(135deg, #1A237E 0%, #0D47A1 100%);
+    border: none;
+    border-radius: 14px;
+    padding: 12px;
+    color: #FFFFFF;
+    font-size: 12.5px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
+    transition: var(--transition-smooth);
+}
+
+.btn-ai-settings-save:hover {
+    background: #000051;
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 18px rgba(26, 35, 126, 0.4);
+}
+
+/* AI Generator panel inside Recipe page */
+.ai-generator-panel {
+    background: linear-gradient(135deg, rgba(26, 35, 126, 0.03) 0%, rgba(30, 136, 229, 0.05) 100%);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1.5px solid rgba(26, 35, 126, 0.1);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: var(--glass-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: slide-in 0.4s ease-out forwards;
+}
+
+.ai-generator-panel.inactive {
+    border-style: dashed;
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.ai-gen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ai-gen-icon {
+    font-size: 20px;
+}
+
+.ai-gen-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.ai-gen-model-tag {
+    font-family: 'Outfit', sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    background: rgba(30, 136, 229, 0.1);
+    color: #1E88E5;
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(30, 136, 229, 0.15);
+}
+
+.ai-gen-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.btn-ai-route-setup {
+    width: 100%;
+    background: rgba(26, 35, 126, 0.06);
+    border: 1px solid rgba(26, 35, 126, 0.12);
+    border-radius: 14px;
+    padding: 10px;
+    color: var(--text-navy);
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.btn-ai-route-setup:hover {
+    background: rgba(26, 35, 126, 0.1);
+    border-color: rgba(26, 35, 126, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-ai-generate {
+    width: 100%;
+    background: linear-gradient(135deg, #1A237E 0%, #1565C0 50%, #42A5F5 100%);
+    background-size: 200% 200%;
+    border: none;
+    border-radius: 14px;
+    padding: 12px;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(26, 35, 126, 0.25);
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    animation: aurora-flow 4s ease infinite, premium-pulse 2s infinite;
+}
+
+.btn-ai-generate:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 20px rgba(66, 165, 245, 0.45);
+}
+
+@keyframes aurora-flow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* AI Hologram Spinner Overlay */
+.ai-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(13, 27, 42, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 2100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.ai-loading-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ai-loading-card {
+    width: 86%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: var(--glass-border);
+    border-radius: 28px;
+    padding: 30px 20px;
+    box-shadow: 0 30px 75px rgba(0, 0, 0, 0.35);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    transform: translateY(30px);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+.ai-loading-overlay.active .ai-loading-card {
+    transform: translateY(0);
+}
+
+.ai-hologram-spinner {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 3px solid transparent;
+    border-top-color: #1A237E;
+    border-bottom-color: #42A5F5;
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite;
+}
+
+.ai-spinner-icon {
+    font-size: 32px;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px rgba(66, 165, 245, 0.4));
+    }
+    50% {
+        transform: scale(1.15);
+        filter: drop-shadow(0 0 12px rgba(66, 165, 245, 0.9));
+    }
+}
+
+.ai-loading-title {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--text-navy);
+}
+
+.ai-loading-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    min-height: 36px;
+}
+
+.ai-loading-steps {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+    background: rgba(26, 35, 126, 0.03);
+    border: 1px dashed rgba(26, 35, 126, 0.1);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin-top: 6px;
+}
+
+.loading-step {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    opacity: 0.5;
+}
+
+.loading-step.active {
+    color: #1A237E;
+    opacity: 1;
+    font-weight: 800;
+    transform: translateX(4px);
+    filter: drop-shadow(0 0 4px rgba(26, 35, 126, 0.15));
+}
+
 
