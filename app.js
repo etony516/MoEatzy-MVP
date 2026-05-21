@@ -17,10 +17,12 @@ let isAiGenerating = false;
  */
 async function loadApiKeyFromEnvironmentFile() {
     try {
-        const res = await fetch('Environment Variables.md');
+        const res = await fetch('Environment%20Variables.md');
         if (res.ok) {
-            const text = await res.text();
-            const match = text.match(/GOOGLE_API_KEY\s*=\s*["']?([^"'\s]+)["']?/);
+            let text = await res.text();
+            // Strip markdown backslash escapes (e.g. \_ → _)
+            text = text.replace(/\\_/g, '_');
+            const match = text.match(/GOOGLE_API_KEY\s*=\s*["']?([^"'\s\r\n]+)["']?/);
             if (match && match[1]) {
                 const apiKey = match[1].trim();
                 window.GOOGLE_API_KEY = apiKey;
