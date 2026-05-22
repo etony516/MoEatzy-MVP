@@ -175,8 +175,28 @@ function changeFilter(filterName) {
     renderSortedIngredients();
 }
 
+// Emoji maps for grouped sections in Refrigerator Inventory
+const categoryEmojis = {
+    "채소": "🥬",
+    "알류/유제품": "🥚",
+    "두부/콩류": "🧈",
+    "육류": "🥩",
+    "반찬/양념": "🌶️",
+    "수산물": "🐟",
+    "과일": "🍎",
+    "기타": "📦"
+};
+
+const locationEmojis = {
+    "채소칸": "🧺",
+    "냉장실": "❄️",
+    "냉동실": "🧊",
+    "기타": "📍"
+};
+
 /**
- * Sorts and draws ingredients based on the selected filter
+ * Sorts and draws ingredients based on the selected filter.
+ * Category and Location filters render nested compartment boxes, while Freshness remains flat.
  */
 function renderSortedIngredients() {
     const listContainer = document.getElementById('inventory-list');
@@ -184,15 +204,6 @@ function renderSortedIngredients() {
     
     // Clone original data to avoid mutation side effects
     let itemsToRender = [...ingredients];
-    
-    // Sort according to activeFilter
-    if (activeFilter === 'dday') {
-        itemsToRender.sort((a, b) => a.dday - b.dday);
-    } else if (activeFilter === 'category') {
-        itemsToRender.sort((a, b) => a.category.localeCompare(b.category));
-    } else if (activeFilter === 'location') {
-        itemsToRender.sort((a, b) => a.location.localeCompare(b.location));
-    }
     
     listContainer.innerHTML = ''; // Clear prior items
     
@@ -207,32 +218,157 @@ function renderSortedIngredients() {
         return;
     }
     
-    itemsToRender.forEach((item, index) => {
-        let badgeClass = 'badge-safe';
-        if (item.dday <= 1) {
-            badgeClass = 'badge-danger';
-        } else if (item.dday <= 3) {
-            badgeClass = 'badge-warn';
-        }
+    if (activeFilter === 'dday') {
+        // Flat chronological list sorted by freshness
+        itemsToRender.sort((a, b) => a.dday - b.dday);
         
-        const cardHTML = `
-            <div class="ingredient-card" style="animation-delay: ${index * 0.08}s">
-                <div class="card-left">
-                    <div class="ingredient-icon-container">
-                        ${item.emoji}
+        itemsToRender.forEach((item, index) => {
+            let badgeClass = 'badge-safe';
+            if (item.dday <= 1) {
+                badgeClass = 'badge-danger';
+            } else if (item.dday <= 3) {
+                badgeClass = 'badge-warn';
+            }
+            
+            const cardHTML = `
+                <div class="ingredient-card" style="animation-delay: ${index * 0.08}s">
+                    <div class="card-left">
+                        <div class="ingredient-icon-container">
+                            ${item.emoji}
+                        </div>
+                        <div class="ingredient-info">
+                            <span class="ingredient-name">${item.name}</span>
+                            <span class="ingredient-location">${item.category} • ${item.location}</span>
+                        </div>
                     </div>
-                    <div class="ingredient-info">
-                        <span class="ingredient-name">${item.name}</span>
-                        <span class="ingredient-location">${item.category} • ${item.location}</span>
+                    <div class="card-right">
+                        <span class="dday-badge ${badgeClass}">D-${item.dday}</span>
                     </div>
                 </div>
-                <div class="card-right">
-                    <span class="dday-badge ${badgeClass}">D-${item.dday}</span>
+            `;
+            listContainer.insertAdjacentHTML('beforeend', cardHTML);
+        });
+    } else if (activeFilter === 'category') {
+        // Group by category into visual list boxes
+        const groups = {};
+        itemsToRender.forEach(item => {
+            if (!groups[item.category]) {
+                groups[item.category] = [];
+            }
+            groups[item.category].push(item);
+        });
+        
+        // Sort categories alphabetically
+        const groupKeys = Object.keys(groups).sort();
+        
+        groupKeys.forEach((groupName, gIdx) => {
+            const groupItems = groups[groupName];
+            // Sort items inside this group by urgency (D-day)
+            groupItems.sort((a, b) => a.dday - b.dday);
+            const groupEmoji = categoryEmojis[groupName] || "📦";
+            
+            let groupHTML = `
+                <div class="fridge-group-box" style="animation-delay: ${gIdx * 0.1}s">
+                    <div class="fridge-group-header">
+                        <span class="fridge-group-title">${groupEmoji} ${groupName}</span>
+                        <span class="fridge-group-count">${groupItems.length}개</span>
+                    </div>
+                    <div class="fridge-group-content">
+            `;
+            
+            groupItems.forEach(item => {
+                let badgeClass = 'badge-safe';
+                if (item.dday <= 1) {
+                    badgeClass = 'badge-danger';
+                } else if (item.dday <= 3) {
+                    badgeClass = 'badge-warn';
+                }
+                
+                groupHTML += `
+                    <div class="ingredient-card">
+                        <div class="card-left">
+                            <div class="ingredient-icon-container">
+                                ${item.emoji}
+                            </div>
+                            <div class="ingredient-info">
+                                <span class="ingredient-name">${item.name}</span>
+                                <span class="ingredient-location">위치: ${item.location}</span>
+                            </div>
+                        </div>
+                        <div class="card-right">
+                            <span class="dday-badge ${badgeClass}">D-${item.dday}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            groupHTML += `
+                    </div>
                 </div>
-            </div>
-        `;
-        listContainer.insertAdjacentHTML('beforeend', cardHTML);
-    });
+            `;
+            listContainer.insertAdjacentHTML('beforeend', groupHTML);
+        });
+    } else if (activeFilter === 'location') {
+        // Group by compartment location into visual list boxes
+        const groups = {};
+        itemsToRender.forEach(item => {
+            if (!groups[item.location]) {
+                groups[item.location] = [];
+            }
+            groups[item.location].push(item);
+        });
+        
+        // Sort locations alphabetically
+        const groupKeys = Object.keys(groups).sort();
+        
+        groupKeys.forEach((groupName, gIdx) => {
+            const groupItems = groups[groupName];
+            // Sort items inside this group by urgency (D-day)
+            groupItems.sort((a, b) => a.dday - b.dday);
+            const groupEmoji = locationEmojis[groupName] || "📍";
+            
+            let groupHTML = `
+                <div class="fridge-group-box" style="animation-delay: ${gIdx * 0.1}s">
+                    <div class="fridge-group-header">
+                        <span class="fridge-group-title">${groupEmoji} ${groupName}</span>
+                        <span class="fridge-group-count">${groupItems.length}개</span>
+                    </div>
+                    <div class="fridge-group-content">
+            `;
+            
+            groupItems.forEach(item => {
+                let badgeClass = 'badge-safe';
+                if (item.dday <= 1) {
+                    badgeClass = 'badge-danger';
+                } else if (item.dday <= 3) {
+                    badgeClass = 'badge-warn';
+                }
+                
+                groupHTML += `
+                    <div class="ingredient-card">
+                        <div class="card-left">
+                            <div class="ingredient-icon-container">
+                                ${item.emoji}
+                            </div>
+                            <div class="ingredient-info">
+                                <span class="ingredient-name">${item.name}</span>
+                                <span class="ingredient-location">종류: ${item.category}</span>
+                            </div>
+                        </div>
+                        <div class="card-right">
+                            <span class="dday-badge ${badgeClass}">D-${item.dday}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            groupHTML += `
+                    </div>
+                </div>
+            `;
+            listContainer.insertAdjacentHTML('beforeend', groupHTML);
+        });
+    }
 }
 
 /**
