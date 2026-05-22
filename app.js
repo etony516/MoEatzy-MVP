@@ -602,57 +602,61 @@ function initializeDynamicUI() {
                 <!-- Initial Option View -->
                 <div id="modal-initial-view">
                     <h3 class="modal-title">📸 AI 스마트 스캔</h3>
+                    <p class="modal-desc" style="margin-bottom: 20px;">영수증, 바코드, 냉장고 사진 또는 즐겨찾기로 간편하게 식재료를 채워보세요.</p>
                     
-                    <!-- 3-tab navigation -->
-                    <div class="scan-modal-tabs">
-                        <button id="btn-scan-tab-image" class="scan-tab-btn active" onclick="switchScanTab('image')">📸 이미지 스캔</button>
-                        <button id="btn-scan-tab-barcode" class="scan-tab-btn" onclick="switchScanTab('barcode')">🏷️ 바코드 스캔</button>
-                        <button id="btn-scan-tab-favorites" class="scan-tab-btn" onclick="switchScanTab('favorites')">⭐ 자주 쓰는 재료</button>
+                    <div class="scan-options-grid-v2">
+                        <button class="scan-grid-option-btn" onclick="startTechnicalScan('receipt')">
+                            <span class="grid-emoji">🧾</span>
+                            <span class="grid-title">영수증 스캔</span>
+                            <span class="grid-desc">영수증 글자 분석 자동 등록</span>
+                        </button>
+                        <button class="scan-grid-option-btn" onclick="showBarcodeScanSubView()">
+                            <span class="grid-emoji">🏷️</span>
+                            <span class="grid-title">바코드 스캔</span>
+                            <span class="grid-desc">바코드로 가공식품 초고속 등록</span>
+                        </button>
+                        <button class="scan-grid-option-btn" onclick="showFavoritesSubView()">
+                            <span class="grid-emoji">⭐</span>
+                            <span class="grid-title">자주 쓰는 재료 즐찾</span>
+                            <span class="grid-desc">나의 단골 재료 원터치 일괄 수납</span>
+                        </button>
+                        <button class="scan-grid-option-btn" onclick="startTechnicalScan('camera')">
+                            <span class="grid-emoji">🧊</span>
+                            <span class="grid-title">냉장고 촬영</span>
+                            <span class="grid-desc">냉장고 사진 식재료 일괄 판별</span>
+                        </button>
                     </div>
-                    
-                    <!-- Tab 1: Image Scan Content -->
-                    <div id="tab-content-image" class="scan-tab-content active">
-                        <p class="modal-desc" style="margin-top: 10px;">영수증을 스캔하거나 냉장고 사진을 업로드하여 식재료를 자동으로 빠르게 채워보세요.</p>
-                        <div class="scan-options-container">
-                            <button class="scan-option-btn" onclick="startTechnicalScan('receipt')">
-                                <span class="emoji-icon">🧾</span>
-                                <div class="scan-option-info">
-                                    <span class="scan-option-title">영수증 업로드 스캔</span>
-                                    <span class="scan-option-desc">장보기 종이 영수증 글자 분석 등록</span>
-                                </div>
-                            </button>
-                            <button class="scan-option-btn" onclick="startTechnicalScan('camera')">
-                                <span class="emoji-icon">🧊</span>
-                                <div class="scan-option-info">
-                                    <span class="scan-option-title">냉장고 촬영 스캔</span>
-                                    <span class="scan-option-desc">카메라 사진으로 냉장고 내부 식재료 판별</span>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
+                </div>
 
-                    <!-- Tab 2: Barcode Scan Content -->
-                    <div id="tab-content-barcode" class="scan-tab-content" style="display: none;">
-                        <p class="modal-desc" style="margin-top: 10px;">가공식품의 바코드를 스캔하여 편리하게 즉시 등록하세요.</p>
-                        <div class="barcode-scanner-area">
-                            <div class="barcode-viewfinder">
-                                <div class="barcode-laser"></div>
-                                <span class="barcode-icon">🥫</span>
-                                <div class="barcode-guide-lines"></div>
-                            </div>
-                            <button class="btn-barcode-scan" onclick="simulateBarcodeScan()">🔍 바코드 스캔 시뮬레이션</button>
-                        </div>
+                <!-- Barcode Scan Sub-view -->
+                <div id="modal-barcode-view" style="display: none;">
+                    <div class="modal-sub-header">
+                        <button class="btn-sub-view-back" onclick="goBackToInitialView()">← 뒤로 가기</button>
+                        <h3 class="modal-title">🏷️ 바코드 스캔</h3>
                     </div>
+                    <p class="modal-desc" style="margin-top: 10px;">가공식품의 바코드를 스캔하여 편리하게 즉시 등록하세요.</p>
+                    <div class="barcode-scanner-area">
+                        <div class="barcode-viewfinder">
+                            <div class="barcode-laser"></div>
+                            <span class="barcode-icon">🥫</span>
+                            <div class="barcode-guide-lines"></div>
+                        </div>
+                        <button class="btn-barcode-scan" onclick="simulateBarcodeScan()">🔍 바코드 스캔 시뮬레이션</button>
+                    </div>
+                </div>
 
-                    <!-- Tab 3: Favorites Content -->
-                    <div id="tab-content-favorites" class="scan-tab-content" style="display: none;">
-                        <p class="modal-desc" style="margin-top: 10px;">자주 구매하는 단골 재료를 선택하고 하단의 버튼을 눌러 일괄 수납하세요.</p>
-                        <div class="favorites-grid" id="favorites-grid">
-                            <!-- Filled dynamically by renderFavoritesGrid() -->
-                        </div>
-                        <div class="favorites-actions">
-                            <button class="btn-favorites-add" onclick="addSelectedFavorites()">🛒 선택한 재료 검토창에 담기</button>
-                        </div>
+                <!-- Favorites Sub-view -->
+                <div id="modal-favorites-view" style="display: none;">
+                    <div class="modal-sub-header">
+                        <button class="btn-sub-view-back" onclick="goBackToInitialView()">← 뒤로 가기</button>
+                        <h3 class="modal-title">⭐ 자주 쓰는 재료 즐찾</h3>
+                    </div>
+                    <p class="modal-desc" style="margin-top: 10px;">자주 구매하는 단골 재료를 선택하고 하단의 버튼을 눌러 일괄 수납하세요.</p>
+                    <div class="favorites-grid" id="favorites-grid">
+                        <!-- Filled dynamically by renderFavoritesGrid() -->
+                    </div>
+                    <div class="favorites-actions">
+                        <button class="btn-favorites-add" onclick="addSelectedFavorites()">🛒 선택한 재료 검토창에 담기</button>
                     </div>
                 </div>
 
@@ -767,21 +771,41 @@ function openScanModal() {
     const overlay = document.getElementById('scan-modal-overlay');
     if (overlay) {
         document.getElementById('modal-initial-view').style.display = 'block';
+        document.getElementById('modal-barcode-view').style.display = 'none';
+        document.getElementById('modal-favorites-view').style.display = 'none';
         document.getElementById('modal-loading-view').style.display = 'none';
+        
         const verifView = document.getElementById('modal-verification-view');
         if (verifView) verifView.style.display = 'none';
         
-        // Reset tabs to image tab
         selectedFavorites = [];
-        switchScanTab('image');
         
         overlay.classList.add('active');
     }
 }
 
 // ==========================================================================
-// Scan Tab Handlers (Image scan, Barcode scan, Favorites scan)
+// Scan Sub-view Navigation Handlers (Barcode Scan & Favorites Grid)
 // ==========================================================================
+
+function showBarcodeScanSubView() {
+    document.getElementById('modal-initial-view').style.display = 'none';
+    document.getElementById('modal-favorites-view').style.display = 'none';
+    document.getElementById('modal-barcode-view').style.display = 'block';
+}
+
+function showFavoritesSubView() {
+    document.getElementById('modal-initial-view').style.display = 'none';
+    document.getElementById('modal-barcode-view').style.display = 'none';
+    document.getElementById('modal-favorites-view').style.display = 'block';
+    renderFavoritesGrid();
+}
+
+function goBackToInitialView() {
+    document.getElementById('modal-barcode-view').style.display = 'none';
+    document.getElementById('modal-favorites-view').style.display = 'none';
+    document.getElementById('modal-initial-view').style.display = 'block';
+}
 
 const favoriteIngredientsDb = [
     { name: "대파", emoji: "🥬", category: "채소", location: "채소칸", dday: 3 },
@@ -795,30 +819,6 @@ const favoriteIngredientsDb = [
 ];
 
 let selectedFavorites = [];
-
-function switchScanTab(tabName) {
-    // Hide all tab contents
-    document.getElementById('tab-content-image').style.display = 'none';
-    document.getElementById('tab-content-barcode').style.display = 'none';
-    document.getElementById('tab-content-favorites').style.display = 'none';
-    
-    // Remove active class from all buttons
-    const buttons = document.querySelectorAll('.scan-tab-btn');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    
-    // Show target content
-    if (tabName === 'image') {
-        document.getElementById('tab-content-image').style.display = 'block';
-        document.getElementById('btn-scan-tab-image').classList.add('active');
-    } else if (tabName === 'barcode') {
-        document.getElementById('tab-content-barcode').style.display = 'block';
-        document.getElementById('btn-scan-tab-barcode').classList.add('active');
-    } else if (tabName === 'favorites') {
-        document.getElementById('tab-content-favorites').style.display = 'block';
-        document.getElementById('btn-scan-tab-favorites').classList.add('active');
-        renderFavoritesGrid();
-    }
-}
 
 function renderFavoritesGrid() {
     const grid = document.getElementById('favorites-grid');
@@ -870,7 +870,7 @@ function addSelectedFavorites() {
     selectedFavorites = [];
     
     // Transition to verification view
-    document.getElementById('modal-initial-view').style.display = 'none';
+    document.getElementById('modal-favorites-view').style.display = 'none';
     document.getElementById('modal-verification-view').style.display = 'block';
     renderScanVerificationScreen();
     showToast(`자주 쓰는 재료 ${tempScanResults.length}건이 임시 수납되었습니다.`, '🛒');
@@ -895,7 +895,7 @@ function simulateBarcodeScan() {
         ];
         
         // Transition to verification view
-        document.getElementById('modal-initial-view').style.display = 'none';
+        document.getElementById('modal-barcode-view').style.display = 'none';
         document.getElementById('modal-verification-view').style.display = 'block';
         renderScanVerificationScreen();
         showToast('바코드 상품 정보 디코딩에 성공하였습니다!', '🥫');
@@ -1367,9 +1367,11 @@ function renderRecipePage(container) {
         <p class="page-subtitle">냉장고에 부재료 매수 없이, 오직 현재 있는 식재료만으로 100% 만드는 15분 식탁.</p>
     `;
     
-    // Filter recipes that can be made with current ingredients OR are AI-generated (since AI already generates them using current ingredients!)
+    // Filter recipes that can be made with current ingredients OR are AI-generated, OR are the three default static recipes!
     const matchedRecipes = recipes.filter(recipe => {
         if (recipe.isAI) return true;
+        // The three core default recipes must always be displayed by default, even if the user deletes some ingredients
+        if (recipe.title === "대파계란볶음밥" || recipe.title === "소세지 볶음" || recipe.title === "애호박 된장찌개") return true;
         return recipe.ingredients.every(reqName => ingredients.some(myIng => myIng.name === reqName));
     });
     

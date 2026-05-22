@@ -3518,5 +3518,89 @@ body {
     font-weight: 850;
 }
 
+/* ==========================================================================
+   AI 스마트 스캔 4옵션 그리드 & 서브 뷰 탐색 스타일 (3차 고도화)
+   ========================================================================== */
+
+.scan-options-grid-v2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.scan-grid-option-btn {
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    border-radius: 16px;
+    padding: 18px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-navy);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: var(--transition-smooth);
+    box-shadow: var(--glass-shadow);
+    text-align: center;
+}
+
+.scan-grid-option-btn:hover {
+    transform: translateY(-3px);
+    background: #FFFFFF;
+    border-color: rgba(26, 35, 126, 0.2);
+    box-shadow: 0 10px 24px rgba(26, 35, 126, 0.08);
+}
+
+.scan-grid-option-btn:active {
+    transform: translateY(0);
+}
+
+.scan-grid-option-btn .grid-emoji {
+    font-size: 28px;
+}
+
+.scan-grid-option-btn .grid-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-navy);
+}
+
+.scan-grid-option-btn .grid-desc {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+.modal-sub-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    border-bottom: 1.5px solid rgba(26, 35, 126, 0.08);
+    padding-bottom: 10px;
+}
+
+.btn-sub-view-back {
+    background: rgba(26, 35, 126, 0.06);
+    border: 1px solid rgba(26, 35, 126, 0.1);
+    color: #1A237E;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-sub-view-back:hover {
+    background: rgba(26, 35, 126, 0.12);
+    transform: translateX(-2px);
+}
+
 
 
