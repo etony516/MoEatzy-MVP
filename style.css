@@ -49,14 +49,14 @@ body {
 /* App Container (Mobile Frame Mockup) */
 .app-container {
     width: 100%;
-    max-width: 540px; /* 더욱 시원한 가독성을 위해 480px에서 540px로 추가 확장 */
-    height: 93vh;     /* 세로 높이를 93vh로 비율에 맞춰 조절 */
-    max-height: 980px;
-    min-height: 820px;
+    max-width: 500px; /* 가독성을 유지하면서 최적의 모바일 비율을 위해 540px에서 500px로 정밀 조율 */
+    height: 92vh;     /* 세로 높이를 92vh로 스위트 스팟 조정 */
+    max-height: 940px;
+    min-height: 780px;
     background: linear-gradient(135deg, #F4F7FA 0%, #E8F1F5 100%);
     position: relative;
-    box-shadow: 0 30px 75px -15px rgba(26, 35, 126, 0.24),
-                0 0 0 12px rgba(255, 255, 255, 0.88),
+    box-shadow: 0 30px 70px -15px rgba(26, 35, 126, 0.22),
+                0 0 0 12px rgba(255, 255, 255, 0.86),
                 0 0 0 14px rgba(26, 35, 126, 0.05);
     border-radius: 40px; /* 스마트폰 베젤 외관 */
     overflow: hidden;
@@ -3802,7 +3802,7 @@ body {
 }
 
 /* Responsive adjustments for smaller screens (Mobile Devices) */
-@media (max-width: 540px) {
+@media (max-width: 500px) {
     body {
         background: #F4F7FA;
         align-items: flex-start;
