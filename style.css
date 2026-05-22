@@ -2248,20 +2248,32 @@ body {
 
 /* Hide collapsible content by default when collapsed */
 .recipe-card.collapsed .recipe-steps-container,
-.recipe-card.collapsed .recipe-action-bar {
+.recipe-card.collapsed .recipe-action-bar,
+.recipe-card.collapsed .recipe-substitutions-box,
+.recipe-card.collapsed .recipe-pref-guide-box {
     max-height: 0;
     opacity: 0;
     overflow: hidden;
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
     pointer-events: none;
-    transition: max-height 0.3s cubic-bezier(0, 1, 0, 1), opacity 0.2s ease, margin 0.3s ease;
+    transition: max-height 0.3s cubic-bezier(0, 1, 0, 1), opacity 0.2s ease, margin 0.3s ease, padding 0.3s ease, border 0.3s ease;
 }
 
 .recipe-card.expanded .recipe-steps-container {
-    max-height: 500px;
+    max-height: 1000px;
     opacity: 1;
     margin-top: 8px;
+    transition: max-height 0.4s ease-in, opacity 0.3s ease 0.1s;
+}
+
+.recipe-card.expanded .recipe-substitutions-box,
+.recipe-card.expanded .recipe-pref-guide-box {
+    max-height: 1000px;
+    opacity: 1;
+    margin-top: 12px;
     transition: max-height 0.4s ease-in, opacity 0.3s ease 0.1s;
 }
 
@@ -2303,11 +2315,11 @@ body {
 }
 
 .recipe-expand-indicator::before {
-    content: '상세 레시피 펼치기';
+    content: '상세 레시피 열기';
 }
 
 .recipe-card.expanded .recipe-expand-indicator::before {
-    content: '레시피 접기';
+    content: '레시피 닫기';
 }
 
 /* ==========================================================================

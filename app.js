@@ -1391,7 +1391,7 @@ function renderRecipeCardHTML(recipe, cardId, delayIndex) {
             </div>
  
             <div class="recipe-steps-container">
-                <span class="recipe-steps-title">🍳 레시피 조리법</span>
+                <span class="recipe-steps-title">🍳 조리법</span>
                 ${recipe.steps.map((step, sIdx) => `
                     <div class="recipe-step-item">
                         <span class="step-number">${sIdx + 1}</span>
