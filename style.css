@@ -2989,6 +2989,43 @@ body {
     box-shadow: 0 4px 15px rgba(76, 175, 80, 0.05);
 }
 
+/* 맞춤설정 저장하기 프리미엄 버튼 스타일 */
+.btn-save-preferences {
+    width: 100%;
+    background: linear-gradient(135deg, #1A237E 0%, #3949AB 50%, #42A5F5 100%);
+    background-size: 200% auto;
+    border: none;
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-size: 17.5px;
+    font-weight: 850;
+    color: #FFFFFF;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(26, 35, 126, 0.24),
+                inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: -0.3px;
+    outline: none;
+    margin-top: 10px;
+}
+
+.btn-save-preferences:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(26, 35, 126, 0.32),
+                inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    background-position: right center; /* 그라데이션 흐름 모션 */
+}
+
+.btn-save-preferences:active {
+    transform: translateY(1px) scale(0.97);
+    box-shadow: 0 4px 12px rgba(26, 35, 126, 0.18);
+    transition: all 0.08s ease;
+}
+
 .save-status-icon {
     font-size: 16px;
     animation: bounce 1.5s infinite;
