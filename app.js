@@ -557,7 +557,7 @@ function renderPlaceholder(container, tabType) {
     
     switch (tabType) {
         case 'shopping':
-            title = 'AI 스마트 바잉 & 리포트';
+            title = '스마트 절약 및 신선 보관 백과';
             subtitle = '보관 비법을 통해 식재료의 신선함을 유지하고 절약 효과를 확인하세요.';
             icon = '📉';
             placeholderTitle = '절약 대시보드 및 잠금 해제 준비 중';
@@ -2141,7 +2141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function renderShoppingPage(container) {
     // 1. Header Information
     const headerHTML = `
-        <h2 class="page-title">AI 스마트 바잉 & 리포트</h2>
+        <h2 class="page-title">스마트 절약 및 신선 보관 백과</h2>
         <p class="page-subtitle">스마트 절약 리포트와 냉장고 선생님의 신선 보관 가이드를 통합 제공합니다.</p>
     `;
 
