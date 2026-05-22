@@ -14,6 +14,7 @@ let isPremiumUser = localStorage.getItem('moeatzy_is_premium') === 'true';
 
 // AI Generator State
 let isAiGenerating = false;
+let selectedCuisineFilter = '한정식';
 
 // User Diet & Allergy Preferences State
 let userPreferencesState = {
@@ -1354,25 +1355,29 @@ function renderRecipeCardHTML(recipe, cardId, delayIndex) {
 }
 
 function renderRecipePage(container) {
-    const aiGeneratorHTML = `
-        <div class="ai-button-wrapper" style="margin-bottom: 24px;">
-            <button class="btn-ai-generate" onclick="generateAIRecipe()">
-                <span>✨</span> AI 활용하여 레시피 추천받기
-            </button>
+    const cuisines = ['한정식', '중식', '양식', '일본식', '분식', '디저트'];
+    const filterHTML = `
+        <div class="cuisine-filter-container">
+            ${cuisines.map(cuisine => {
+                const isActive = selectedCuisineFilter === cuisine;
+                return `
+                    <button class="cuisine-filter-chip ${isActive ? 'active' : ''}" onclick="selectCuisineFilter('${cuisine}')">
+                        ${cuisine}
+                    </button>
+                `;
+            }).join('')}
         </div>
     `;
 
     const headerHTML = `
-        <h2 class="page-title">AI 현실형 레시피</h2>
+        <h2 class="page-title">현실형 맞춤 레시피</h2>
         <p class="page-subtitle">냉장고에 부재료 매수 없이, 오직 현재 있는 식재료만으로 100% 만드는 15분 식탁.</p>
     `;
     
-    // Filter recipes that can be made with current ingredients OR are AI-generated, OR are the three default static recipes!
+    // Filter recipes: Bypassing filter for all static recipes to make them robust
     const matchedRecipes = recipes.filter(recipe => {
         if (recipe.isAI) return true;
-        // The three core default recipes must always be displayed by default, even if the user deletes some ingredients
-        if (recipe.title === "대파계란볶음밥" || recipe.title === "소세지 볶음" || recipe.title === "애호박 된장찌개") return true;
-        return recipe.ingredients.every(reqName => ingredients.some(myIng => myIng.name === reqName));
+        return true;
     });
     
     // Sort recipes by the minimum dday of their required ingredients (ascending - most urgent first)
@@ -1387,7 +1392,7 @@ function renderRecipePage(container) {
         return getMinDday(a) - getMinDday(b);
     });
 
-    // Bifurcate recipes: Urgent (D-3 or less required ingredients) vs General AI Recipes
+    // Bifurcate recipes: Urgent (D-3 or less required ingredients) vs Category-based Recipes
     const urgentRecipes = sortedRecipes.filter(recipe => {
         return recipe.ingredients.some(ingName => {
             const matched = ingredients.find(i => i.name === ingName);
@@ -1395,17 +1400,15 @@ function renderRecipePage(container) {
         });
     });
 
+    // General recipes match the currently selected cuisine filter
     const generalRecipes = sortedRecipes.filter(recipe => {
-        return !recipe.ingredients.some(ingName => {
-            const matched = ingredients.find(i => i.name === ingName);
-            return matched && matched.dday <= 3;
-        });
+        return recipe.cuisine === selectedCuisineFilter;
     });
 
     let urgentHTML = '';
     let generalHTML = '';
 
-    // Render Urgent Box
+    // Render Urgent Box (Fixed at top)
     if (urgentRecipes.length > 0) {
         urgentHTML = `
             <div class="recipe-section-box urgent-section">
@@ -1428,17 +1431,15 @@ function renderRecipePage(container) {
         `;
     }
 
-    // Render General Box
-    if (generalRecipes.length > 0 || urgentRecipes.length > 0) {
-        // Display other recipes as general AI recipes
-        const displayGeneral = generalRecipes.length > 0 ? generalRecipes : sortedRecipes;
-        const generalTitle = generalRecipes.length > 0 ? '🍳 전체 추천 AI 레시피' : '🍳 추천 레시피 전체 목록';
+    // Render Category Recommendations Box
+    if (generalRecipes.length > 0) {
+        const generalTitle = `🍳 ${selectedCuisineFilter} 추천 레시피`;
         generalHTML = `
             <div class="recipe-section-box general-section" style="margin-top: 24px;">
                 <h3 class="recipe-section-title">${generalTitle}</h3>
-                <p class="recipe-section-subtitle">보유하신 전체 식재료들을 골고루 활용해 즐길 수 있는 맛있는 한끼 레시피입니다.</p>
+                <p class="recipe-section-subtitle">보유하신 전체 식재료들을 활용해 즐길 수 있는 맛있는 ${selectedCuisineFilter} 한끼입니다.</p>
                 <div class="recipe-list">
-                    ${displayGeneral.map((recipe, rIdx) => renderRecipeCardHTML(recipe, `recipe-card-general-${rIdx}`, rIdx + urgentRecipes.length)).join('')}
+                    ${generalRecipes.map((recipe, rIdx) => renderRecipeCardHTML(recipe, `recipe-card-general-${rIdx}`, rIdx + urgentRecipes.length)).join('')}
                 </div>
             </div>
         `;
@@ -1446,13 +1447,21 @@ function renderRecipePage(container) {
         generalHTML = `
             <div class="placeholder-container" style="min-height: 250px; margin-top: 10px;">
                 <span class="placeholder-icon">🥣</span>
-                <h3 class="placeholder-title">구출 가능한 레시피가 없습니다</h3>
-                <p class="placeholder-desc">현재 보유 중인 재료가 소모되어 조리 가능한 요리가 없습니다. 상단 스캔 버튼을 눌러 새 식재료를 채워보세요!</p>
+                <h3 class="placeholder-title">해당 분야의 레시피가 없습니다</h3>
+                <p class="placeholder-desc">현재 선택하신 카테고리에 해당하는 레시피가 등록되어 있지 않습니다. 다른 카테고리를 터치해 보세요!</p>
             </div>
         `;
     }
 
-    container.innerHTML = headerHTML + aiGeneratorHTML + urgentHTML + generalHTML;
+    container.innerHTML = headerHTML + filterHTML + urgentHTML + generalHTML;
+}
+
+function selectCuisineFilter(cuisine) {
+    selectedCuisineFilter = cuisine;
+    const contentArea = document.getElementById('content');
+    if (contentArea && currentTab === 'recipe') {
+        renderRecipePage(contentArea);
+    }
 }
 
 /**
