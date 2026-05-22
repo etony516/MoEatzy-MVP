@@ -83,13 +83,22 @@ function switchTab(tabName) {
     currentTab = tabName;
     console.log(`[MoEatzy] Switched to tab: ${tabName}`);
     
-    // 1. Control Header Scan Button Visibility based on Tab
+    // 1. Control Header Scan Button & Floating FAB Visibility based on Tab
     const scanBtn = document.getElementById('header-scan-btn');
     if (scanBtn) {
         if (tabName === 'inventory') {
             scanBtn.style.display = 'flex';
         } else {
             scanBtn.style.display = 'none';
+        }
+    }
+
+    const floatScanBtn = document.getElementById('floating-scan-btn');
+    if (floatScanBtn) {
+        if (tabName === 'inventory') {
+            floatScanBtn.classList.add('visible');
+        } else {
+            floatScanBtn.classList.remove('visible');
         }
     }
     
@@ -521,8 +530,8 @@ function initializeDynamicUI() {
         <div id="fake-modal-overlay" class="fake-modal-overlay">
             <div class="fake-modal-card">
                 <span class="fake-badge-icon">🛡️</span>
-                <h3 class="fake-modal-title">지불 의사 신호 전송 성공 (Signal Logged)</h3>
-                <p class="fake-modal-desc">
+                <h3 id="fake-modal-title" class="fake-modal-title">지불 의사 신호 전송 성공 (Signal Logged)</h3>
+                <p id="fake-modal-desc" class="fake-modal-desc">
                     현재 베타 테스트 중인 프리미엄 기능입니다.<br>
                     소중한 지불 의사 신호가 개발팀 서버에 100% 안전하게 기록되었습니다!<br><br>
                     정식 버전 출시 시 최우선 할인 혜택을 보내드리겠습니다. 감사합니다.
@@ -1533,10 +1542,27 @@ function renderShoppingPage(container) {
 
 /**
  * Open the Premium Subscription (Fake Door) Modal
+ * @param {string} planName 
+ * @param {string} price 
  */
-function openFakeDoorModal() {
-    console.log("[WTP LOG] Premium Subscription 990 KRW clicked at " + new Date().toISOString());
+function openFakeDoorModal(planName = '월간 프리미엄 멤버십', price = '월 990원') {
+    console.log(`[WTP LOG] Premium Subscription ${planName} (${price}) clicked at ` + new Date().toISOString());
     const overlay = document.getElementById('fake-modal-overlay');
+    const titleEl = document.getElementById('fake-modal-title');
+    const descEl = document.getElementById('fake-modal-desc');
+    
+    if (titleEl) {
+        titleEl.innerHTML = `🛡️ 지불 의사 확인 완료`;
+    }
+    if (descEl) {
+        descEl.innerHTML = `
+            선택하신 플랜: <strong style="color: #1A237E; font-size: 12.5px;">${planName} (${price})</strong><br><br>
+            현재 베타 테스트 중인 프리미엄 기능입니다.<br>
+            소중한 지불 의사 신호가 개발팀 서버에 100% 안전하게 기록되었습니다!<br><br>
+            정식 버전 출시 시 최우선 할인 혜택을 보내드리겠습니다. 감사합니다.
+        `;
+    }
+    
     if (overlay) {
         overlay.classList.add('active');
     }
@@ -1633,6 +1659,44 @@ function renderMyPage(container) {
         </div>
     `;
 
+    // 4.5. Premium Subscription Plan Card
+    const subscriptionHTML = `
+        <h3 class="section-sub-title">✨ 프리미엄 요리 메이트 구독</h3>
+        <div class="my-subscription-card">
+            <div class="sub-card-header">
+                <span class="sub-premium-badge">PREMIUM</span>
+                <h4 class="sub-card-title">모잇지 프리미엄 멤버십</h4>
+                <p class="sub-card-desc">AI 스마트 바잉 엔진 언락 및 무제한 맞춤 레시피 가이드를 제공합니다.</p>
+            </div>
+            
+            <div class="sub-tiers-container">
+                <div class="sub-tier-option ${selectedSubscriptionTier === 'monthly' ? 'active' : ''}" id="sub-tier-monthly" onclick="selectSubTier('monthly')">
+                    <div class="tier-radio">
+                        <div class="tier-radio-inner"></div>
+                    </div>
+                    <div class="tier-info">
+                        <span class="tier-name">월간 요리 메이트 플랜</span>
+                        <span class="tier-price">월 990원</span>
+                    </div>
+                    <span class="tier-badge">실속파 추천</span>
+                </div>
+                
+                <div class="sub-tier-option ${selectedSubscriptionTier === 'yearly' ? 'active' : ''}" id="sub-tier-yearly" onclick="selectSubTier('yearly')">
+                    <div class="tier-radio">
+                        <div class="tier-radio-inner"></div>
+                    </div>
+                    <div class="tier-info">
+                        <span class="tier-name">연간 요리 메이트 플랜</span>
+                        <span class="tier-price">연 9,900원</span>
+                    </div>
+                    <span class="tier-badge discount">16% 할인</span>
+                </div>
+            </div>
+            
+            <button class="btn-sub-trigger" onclick="triggerSubscription()">구독 시작하기</button>
+        </div>
+    `;
+
     // 5. Future Roadmap Banner
     const roadmapHTML = `
         <div class="roadmap-banner">
@@ -1644,7 +1708,7 @@ function renderMyPage(container) {
         </div>
     `;
 
-    container.innerHTML = headerHTML + profileCardHTML + preferencesHTML + statsHTML + roadmapHTML;
+    container.innerHTML = headerHTML + profileCardHTML + preferencesHTML + statsHTML + subscriptionHTML + roadmapHTML;
 }
 
 /**
@@ -1659,4 +1723,40 @@ function togglePreferenceChip(element) {
     const name = element.innerText.trim();
     const isActive = element.classList.contains('active');
     console.log(`[MoEatzy preference] Toggled: "${name}" -> ${isActive ? 'ON' : 'OFF'}`);
+}
+
+// Premium Subscription tier state and click handlers
+let selectedSubscriptionTier = 'monthly';
+
+/**
+ * Handle subscription tier selection card clicks
+ * @param {string} tier 'monthly' | 'yearly'
+ */
+function selectSubTier(tier) {
+    selectedSubscriptionTier = tier;
+    console.log(`[MoEatzy subscription] Selected tier: ${tier}`);
+    
+    const monthlyBtn = document.getElementById('sub-tier-monthly');
+    const yearlyBtn = document.getElementById('sub-tier-yearly');
+    
+    if (monthlyBtn && yearlyBtn) {
+        if (tier === 'monthly') {
+            monthlyBtn.classList.add('active');
+            yearlyBtn.classList.remove('active');
+        } else {
+            monthlyBtn.classList.remove('active');
+            yearlyBtn.classList.add('active');
+        }
+    }
+}
+
+/**
+ * Trigger mock premium subscription checkout overlay
+ */
+function triggerSubscription() {
+    if (selectedSubscriptionTier === 'monthly') {
+        openFakeDoorModal('월간 요리 메이트 플랜', '월 990원');
+    } else {
+        openFakeDoorModal('연간 요리 메이트 플랜', '연 9,900원');
+    }
 }
