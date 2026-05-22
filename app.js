@@ -522,8 +522,8 @@ function renderPlaceholder(container, tabType) {
     
     switch (tabType) {
         case 'shopping':
-            title = '스마트 바잉 & 리포트';
-            subtitle = '이번 달 절약 효과를 파악하고, 현명한 소비 계획을 세웁니다.';
+            title = '신선 백과 & 리포트';
+            subtitle = '보관 비법을 통해 식재료의 신선함을 유지하고 절약 효과를 확인하세요.';
             icon = '📉';
             placeholderTitle = '절약 대시보드 및 잠금 해제 준비 중';
             placeholderDesc = '사용자가 냉장고를 비우며 절약한 비용의 누적 가치를 그래프로 체감하고, 유료 바잉 가이드 잠금 해제 버튼을 통한 지불 의사 검증 실험 장치가 완성됩니다.';
@@ -1611,76 +1611,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 function renderShoppingPage(container) {
     // 1. Header Information
     const headerHTML = `
-        <h2 class="page-title">스마트 바잉 & 리포트</h2>
-        <p class="page-subtitle">이번 달 식재료 구출로 아낀 예산과 탄소 발자국 절감액을 한눈에 체감하세요.</p>
+        <h2 class="page-title">신선 백과 & 리포트</h2>
+        <p class="page-subtitle">보관 비법을 통해 식재료의 신선함을 유지하고 절약 효과를 확인하세요.</p>
     `;
 
-    // 2. Savings Report Card
-    const reportCardHTML = `
-        <div class="savings-report-card">
-            <div class="savings-stats-row">
-                <div class="savings-stat-panel">
-                    <span class="savings-stat-title">이번 달 누적 식비 절감액</span>
-                    <span class="savings-stat-bigval">47,500원</span>
-                </div>
-                <div class="savings-stat-panel">
-                    <span class="savings-stat-title">음식 폐기 절감량</span>
-                    <span class="savings-stat-bigval eco">-3.2kg</span>
-                </div>
-            </div>
-            
-            <div class="savings-chart-box">
-                <span class="chart-title">주차별 식비 절약 추이</span>
-                <div class="bar-graph-container">
-                    <div class="bar-graph-column">
-                        <span class="bar-val">12,000원</span>
-                        <div class="bar-wrapper">
-                            <div class="bar-fill" data-height="30%"></div>
-                        </div>
-                        <span class="bar-label">1주차</span>
-                    </div>
-                    <div class="bar-graph-column">
-                        <span class="bar-val">18,500원</span>
-                        <div class="bar-wrapper">
-                            <div class="bar-fill" data-height="50%"></div>
-                        </div>
-                        <span class="bar-label">2주차</span>
-                    </div>
-                    <div class="bar-graph-column">
-                        <span class="bar-val">47,500원</span>
-                        <div class="bar-wrapper">
-                            <div class="bar-fill" data-height="90%"></div>
-                        </div>
-                        <span class="bar-label">3주차</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // 2.5 Cumulative Achievement Stats (Moved from My Page for logical cohesion)
-    const statsHTML = `
-        <h3 class="section-sub-title" style="margin-top: 24px;">🏆 누적 식재료 구출 업적</h3>
-        <div class="my-stats-grid">
-            <div class="my-stat-card">
-                <span class="my-stat-emoji">🍲</span>
-                <span class="my-stat-val">12회</span>
-                <span class="my-stat-label">요리 구출 성공</span>
-            </div>
-            <div class="my-stat-card">
-                <span class="my-stat-emoji">💰</span>
-                <span class="my-stat-val">78,000원</span>
-                <span class="my-stat-label">누적 식비 절감</span>
-            </div>
-            <div class="my-stat-card">
-                <span class="my-stat-emoji">🌲</span>
-                <span class="my-stat-val">5.4kg</span>
-                <span class="my-stat-label">온실가스 감축</span>
-            </div>
-        </div>
-    `;
-
-    // 3. Refrigerator Teacher Storage Guide Section
+    // 2. Refrigerator Teacher Storage Guide Section (Moved to the Top!)
     // Filter out selected items if they are no longer in the refrigerator list
     teacherSelectedIngredients = teacherSelectedIngredients.filter(name => ingredients.some(i => i.name === name));
 
@@ -1747,7 +1682,7 @@ function renderShoppingPage(container) {
     }
 
     const teacherSectionHTML = `
-        <div class="teacher-container" style="margin-top: 28px;">
+        <div class="teacher-container" style="margin-top: 16px;">
             <div class="teacher-header">
                 <h3 class="section-head-title" style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
                     👨‍🏫 냉장고 선생님의 신선 보관 백과
@@ -1767,7 +1702,84 @@ function renderShoppingPage(container) {
         </div>
     `;
 
-    container.innerHTML = headerHTML + reportCardHTML + statsHTML + teacherSectionHTML;
+    // 3. Section Divider and Header for Reports (Moved to the Bottom!)
+    const reportHeaderHTML = `
+        <div style="margin-top: 36px; margin-bottom: 16px;">
+            <h3 class="section-head-title" style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                📊 스마트 절약 & 환경 리포트
+            </h3>
+            <p class="section-subtitle" style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 0; line-height: 1.4;">
+                식재료 구출로 아낀 예산과 탄소 발자국 절감액을 한눈에 체감하세요.
+            </p>
+        </div>
+    `;
+
+    // 4. Savings Report Card
+    const reportCardHTML = `
+        <div class="savings-report-card">
+            <div class="savings-stats-row">
+                <div class="savings-stat-panel">
+                    <span class="savings-stat-title">이번 달 누적 식비 절감액</span>
+                    <span class="savings-stat-bigval">47,500원</span>
+                </div>
+                <div class="savings-stat-panel">
+                    <span class="savings-stat-title">음식 폐기 절감량</span>
+                    <span class="savings-stat-bigval eco">-3.2kg</span>
+                </div>
+            </div>
+            
+            <div class="savings-chart-box">
+                <span class="chart-title">주차별 식비 절약 추이</span>
+                <div class="bar-graph-container">
+                    <div class="bar-graph-column">
+                        <span class="bar-val">12,000원</span>
+                        <div class="bar-wrapper">
+                            <div class="bar-fill" data-height="30%"></div>
+                        </div>
+                        <span class="bar-label">1주차</span>
+                    </div>
+                    <div class="bar-graph-column">
+                        <span class="bar-val">18,500원</span>
+                        <div class="bar-wrapper">
+                            <div class="bar-fill" data-height="50%"></div>
+                        </div>
+                        <span class="bar-label">2주차</span>
+                    </div>
+                    <div class="bar-graph-column">
+                        <span class="bar-val">47,500원</span>
+                        <div class="bar-wrapper">
+                            <div class="bar-fill" data-height="90%"></div>
+                        </div>
+                        <span class="bar-label">3주차</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 5. Cumulative Achievement Stats
+    const statsHTML = `
+        <h3 class="section-sub-title" style="margin-top: 24px;">🏆 누적 식재료 구출 업적</h3>
+        <div class="my-stats-grid">
+            <div class="my-stat-card">
+                <span class="my-stat-emoji">🍲</span>
+                <span class="my-stat-val">12회</span>
+                <span class="my-stat-label">요리 구출 성공</span>
+            </div>
+            <div class="my-stat-card">
+                <span class="my-stat-emoji">💰</span>
+                <span class="my-stat-val">78,000원</span>
+                <span class="my-stat-label">누적 식비 절감</span>
+            </div>
+            <div class="my-stat-card">
+                <span class="my-stat-emoji">🌲</span>
+                <span class="my-stat-val">5.4kg</span>
+                <span class="my-stat-label">온실가스 감축</span>
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = headerHTML + teacherSectionHTML + reportHeaderHTML + reportCardHTML + statsHTML;
 
     // Trigger the bar-fill height transition after mounting to DOM
     setTimeout(() => {
