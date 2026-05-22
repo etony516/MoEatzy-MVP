@@ -1480,10 +1480,10 @@ function renderRecipePage(container) {
         // 1. Core Default Recipes Check
         const isCoreDefault = recipe.title === "대파계란볶음밥" || recipe.title === "소세지 볶음" || recipe.title === "애호박 된장찌개";
         
-        // Check ingredient match (unless core default)
+        // Check ingredient match (유연한 매칭: 필요한 식재료 중 1개라도 있으면 폭넓게 매칭 추천)
         if (!isCoreDefault) {
-            const hasAllIngredients = recipe.ingredients.every(reqName => ingredients.some(myIng => myIng.name === reqName));
-            if (!hasAllIngredients) return false;
+            const hasAtLeastOneIngredient = recipe.ingredients.some(reqName => ingredients.some(myIng => myIng.name === reqName));
+            if (!hasAtLeastOneIngredient) return false;
         }
         
         // 2. Diet Type Filter Checking
