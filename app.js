@@ -556,7 +556,7 @@ function renderPlaceholder(container, tabType) {
     
     switch (tabType) {
         case 'shopping':
-            title = '신선 백과 & 리포트';
+            title = 'AI 스마트 바잉 & 리포트';
             subtitle = '보관 비법을 통해 식재료의 신선함을 유지하고 절약 효과를 확인하세요.';
             icon = '📉';
             placeholderTitle = '절약 대시보드 및 잠금 해제 준비 중';
@@ -1909,8 +1909,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 function renderShoppingPage(container) {
     // 1. Header Information
     const headerHTML = `
-        <h2 class="page-title">신선 백과 & 리포트</h2>
-        <p class="page-subtitle">보관 비법을 통해 식재료의 신선함을 유지하고 절약 효과를 확인하세요.</p>
+        <h2 class="page-title">AI 스마트 바잉 & 리포트</h2>
+        <p class="page-subtitle">스마트 절약 리포트와 냉장고 선생님의 신선 보관 가이드를 통합 제공합니다.</p>
     `;
 
     // 2. Refrigerator Teacher Storage Guide Section (Moved to the Top!)
@@ -1994,7 +1994,7 @@ function renderShoppingPage(container) {
     }
 
     const teacherSectionHTML = `
-        <div class="teacher-container" style="margin-top: 16px;">
+        <div class="teacher-container" style="margin-top: 36px; margin-bottom: 40px;">
             <div class="teacher-header">
                 <h3 class="section-head-title" style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
                     👨‍🏫 냉장고 선생님의 신선 보관 백과
@@ -2014,9 +2014,9 @@ function renderShoppingPage(container) {
         </div>
     `;
 
-    // 3. Section Divider and Header for Reports (Moved to the Bottom!)
+    // 3. Section Divider and Header for Reports (Moved to the Top!)
     const reportHeaderHTML = `
-        <div style="margin-top: 36px; margin-bottom: 16px;">
+        <div style="margin-top: 16px; margin-bottom: 16px;">
             <h3 class="section-head-title" style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
                 📊 스마트 절약 & 환경 리포트
             </h3>
@@ -2091,7 +2091,7 @@ function renderShoppingPage(container) {
         </div>
     `;
 
-    container.innerHTML = headerHTML + teacherSectionHTML + reportHeaderHTML + reportCardHTML + statsHTML;
+    container.innerHTML = headerHTML + reportHeaderHTML + reportCardHTML + statsHTML + teacherSectionHTML;
 
     // Trigger the bar-fill height transition after mounting to DOM
     setTimeout(() => {
