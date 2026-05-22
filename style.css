@@ -80,7 +80,7 @@ body {
 
 .logo {
     font-family: 'Outfit', sans-serif;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 800;
     letter-spacing: -0.5px;
     color: var(--text-navy);
@@ -124,7 +124,7 @@ body {
 }
 
 .status-text {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text-muted);
 }
@@ -179,7 +179,7 @@ body {
     justify-content: center;
     gap: 4px;
     color: var(--text-muted);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
     flex: 1;
     height: 100%;
@@ -188,7 +188,7 @@ body {
 }
 
 .tab-icon {
-    font-size: 20px;
+    font-size: 23px;
     transition: var(--transition-smooth);
     opacity: 0.6;
 }
@@ -238,14 +238,14 @@ body {
    ========================================================================== */
 
 .page-title {
-    font-size: 20px;
+    font-size: 23px;
     font-weight: 800;
     color: var(--text-navy);
     margin-bottom: 4px;
 }
 
 .page-subtitle {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--text-muted);
     margin-bottom: 20px;
 }
@@ -262,7 +262,7 @@ body {
     border: var(--glass-border);
     border-radius: 12px;
     padding: 8px 16px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text-muted);
     cursor: pointer;
@@ -326,7 +326,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 25px;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
@@ -337,13 +337,13 @@ body {
 }
 
 .ingredient-name {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--text-navy);
 }
 
 .ingredient-location {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-muted);
 }
 
@@ -351,7 +351,7 @@ body {
 .dday-badge {
     border-radius: 12px;
     padding: 6px 14px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     font-family: 'Outfit', sans-serif;
     letter-spacing: 0.5px;
@@ -407,20 +407,20 @@ body {
 }
 
 .placeholder-icon {
-    font-size: 48px;
+    font-size: 55px;
     margin-bottom: 16px;
     filter: drop-shadow(0 4px 8px rgba(26, 35, 126, 0.1));
 }
 
 .placeholder-title {
-    font-size: 18px;
+    font-size: 21px;
     font-weight: 800;
     color: var(--text-navy);
     margin-bottom: 8px;
 }
 
 .placeholder-desc {
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.6;
     color: var(--text-muted);
 }
@@ -434,7 +434,7 @@ body {
     border: none;
     border-radius: 20px;
     padding: 8px 16px;
-    font-size: 12.5px;
+    font-size: 14.5px;
     font-weight: 800;
     color: #FFFFFF;
     cursor: pointer;
@@ -469,7 +469,7 @@ body {
 }
 
 .scan-btn-icon {
-    font-size: 13px;
+    font-size: 15px;
 }
 
 /* Floating Action Button (FAB) for Smart Scan */
@@ -482,7 +482,7 @@ body {
     border: none;
     border-radius: 50px;
     padding: 13px 20px;
-    font-size: 13.5px;
+    font-size: 15.5px;
     font-weight: 800;
     color: #FFFFFF;
     cursor: pointer;
@@ -515,7 +515,7 @@ body {
 }
 
 .fab-icon {
-    font-size: 15px;
+    font-size: 17px;
 }
 
 .fab-text {
@@ -582,7 +582,7 @@ body {
     right: 18px;
     background: none;
     border: none;
-    font-size: 18px;
+    font-size: 21px;
     color: var(--text-muted);
     cursor: pointer;
     width: 28px;
@@ -600,7 +600,7 @@ body {
 }
 
 .modal-title {
-    font-size: 18px;
+    font-size: 21px;
     font-weight: 800;
     color: var(--text-navy);
     margin-bottom: 6px;
@@ -610,7 +610,7 @@ body {
 }
 
 .modal-desc {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-muted);
     line-height: 1.5;
     margin-bottom: 20px;
@@ -628,7 +628,7 @@ body {
     border: var(--glass-border);
     border-radius: 16px;
     padding: 16px;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--text-navy);
     cursor: pointer;
@@ -650,7 +650,7 @@ body {
 }
 
 .scan-option-btn .emoji-icon {
-    font-size: 24px;
+    font-size: 28px;
 }
 
 .scan-option-info {
@@ -661,13 +661,13 @@ body {
 }
 
 .scan-option-title {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--text-navy);
 }
 
 .scan-option-desc {
-    font-size: 10px;
+    font-size: 12px;
     color: var(--text-muted);
     font-weight: 500;
 }
@@ -708,7 +708,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 32px;
+    font-size: 37px;
     opacity: 0.2;
     animation: heartbeat 1.5s ease-in-out infinite;
 }
@@ -724,7 +724,7 @@ body {
 }
 
 .scan-loading-label {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--text-navy);
     margin-bottom: 10px;
@@ -748,7 +748,7 @@ body {
 }
 
 .progress-pct {
-    font-size: 11px;
+    font-size: 13px;
     font-family: 'Outfit', sans-serif;
     font-weight: 700;
     color: var(--text-muted);
@@ -770,7 +770,7 @@ body {
     border-radius: 16px;
     padding: 14px 18px;
     color: #FFFFFF;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     line-height: 1.4;
     display: flex;
@@ -790,7 +790,7 @@ body {
 }
 
 .toast.toast-icon {
-    font-size: 18px;
+    font-size: 21px;
 }
 
 /* ==========================================================================
@@ -827,7 +827,7 @@ body {
 }
 
 .recipe-title {
-    font-size: 17px;
+    font-size: 20px;
     font-weight: 800;
     color: var(--text-navy);
     line-height: 1.35;
@@ -846,7 +846,7 @@ body {
     color: var(--text-navy);
     padding: 3px 8px;
     border-radius: 8px;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -875,7 +875,7 @@ body {
 }
 
 .recipe-ing-title {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 800;
     color: var(--text-muted);
     width: 100%;
@@ -883,7 +883,7 @@ body {
 }
 
 .recipe-ing-tag {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     background: #E8F5E9;
     color: #2E7D32;
@@ -903,7 +903,7 @@ body {
 }
 
 .recipe-steps-title {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     color: var(--text-navy);
 }
@@ -911,7 +911,7 @@ body {
 .recipe-step-item {
     display: flex;
     gap: 8px;
-    font-size: 11.5px;
+    font-size: 13.5px;
     line-height: 1.5;
     color: var(--text-navy);
     font-weight: 500;
@@ -921,7 +921,7 @@ body {
     background: var(--text-navy);
     color: #FFFFFF;
     font-family: 'Outfit', sans-serif;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     width: 16px;
     height: 16px;
@@ -951,7 +951,7 @@ body {
     border-radius: 12px;
     padding: 12px 16px;
     color: #FFFFFF;
-    font-size: 12.5px;
+    font-size: 14.5px;
     font-weight: 800;
     cursor: pointer;
     flex: 1 1 55%;
@@ -979,7 +979,7 @@ body {
     border-radius: 12px;
     padding: 12px;
     color: var(--text-muted);
-    font-size: 12.5px;
+    font-size: 14.5px;
     font-weight: 700;
     cursor: pointer;
     flex: 1 1 35%;
@@ -1003,7 +1003,7 @@ body {
     border-radius: 12px;
     padding: 12px;
     color: var(--text-navy);
-    font-size: 12.5px;
+    font-size: 14.5px;
     font-weight: 700;
     cursor: pointer;
     flex: 1 1 100%;
@@ -1100,18 +1100,18 @@ body {
 }
 
 .reward-badge-icon {
-    font-size: 44px;
+    font-size: 51px;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
 }
 
 .reward-title {
-    font-size: 18px;
+    font-size: 21px;
     font-weight: 800;
     color: var(--text-navy);
 }
 
 .reward-desc {
-    font-size: 11.5px;
+    font-size: 13.5px;
     color: var(--text-muted);
     line-height: 1.5;
 }
@@ -1138,7 +1138,7 @@ body {
 
 .reward-stat-val {
     font-family: 'Outfit', sans-serif;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 800;
     color: var(--text-navy);
 }
@@ -1152,7 +1152,7 @@ body {
 }
 
 .reward-stat-label {
-    font-size: 9.5px;
+    font-size: 11.5px;
     color: var(--text-muted);
     font-weight: 700;
 }
@@ -1164,7 +1164,7 @@ body {
     border-radius: 14px;
     padding: 12px;
     color: #FFFFFF;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 800;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(26, 35, 126, 0.25);
@@ -1213,14 +1213,14 @@ body {
 }
 
 .savings-stat-title {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 800;
     color: var(--text-muted);
 }
 
 .savings-stat-bigval {
     font-family: 'Outfit', sans-serif;
-    font-size: 20px;
+    font-size: 23px;
     font-weight: 900;
     color: var(--text-navy);
 }
@@ -1239,7 +1239,7 @@ body {
 }
 
 .chart-title {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 800;
     color: var(--text-navy);
 }
@@ -1280,13 +1280,13 @@ body {
 
 .bar-val {
     font-family: 'Outfit', sans-serif;
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 800;
     color: var(--text-navy);
 }
 
 .bar-label {
-    font-size: 9.5px;
+    font-size: 11.5px;
     font-weight: 700;
     color: var(--text-muted);
 }
@@ -1310,7 +1310,7 @@ body {
 }
 
 .section-head-title {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 800;
     color: var(--text-navy);
     margin-bottom: 12px;
@@ -1351,18 +1351,18 @@ body {
 }
 
 .lock-badge-icon {
-    font-size: 32px;
+    font-size: 37px;
     filter: drop-shadow(0 2px 4px rgba(26, 35, 126, 0.15));
 }
 
 .lock-card-title {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 800;
     color: var(--text-navy);
 }
 
 .lock-card-desc {
-    font-size: 10.5px;
+    font-size: 12.5px;
     color: var(--text-muted);
     line-height: 1.5;
 }
@@ -1375,7 +1375,7 @@ body {
     border-radius: 12px;
     padding: 12px;
     color: #FFFFFF;
-    font-size: 11.5px;
+    font-size: 13.5px;
     font-weight: 800;
     cursor: pointer;
     transition: var(--transition-smooth);
@@ -1414,17 +1414,17 @@ body {
 }
 
 .mock-shop-emoji {
-    font-size: 20px;
+    font-size: 23px;
 }
 
 .mock-shop-name {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text-navy);
 }
 
 .mock-shop-mall {
-    font-size: 9px;
+    font-size: 11px;
     background: #EEEEEE;
     color: #666666;
     padding: 2px 6px;
@@ -1435,7 +1435,7 @@ body {
 
 .mock-shop-right {
     font-family: 'Outfit', sans-serif;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     color: var(--text-navy);
 }
@@ -1493,7 +1493,7 @@ body {
 }
 
 .fake-badge-icon {
-    font-size: 40px;
+    font-size: 46px;
     filter: drop-shadow(0 4px 10px rgba(66, 165, 245, 0.3));
     animation: bounce 2s infinite;
 }
@@ -1504,13 +1504,13 @@ body {
 }
 
 .fake-modal-title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 800;
     color: var(--text-navy);
 }
 
 .fake-modal-desc {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-muted);
     line-height: 1.6;
     background: rgba(26, 35, 126, 0.03);
@@ -1526,7 +1526,7 @@ body {
     border-radius: 14px;
     padding: 12px;
     color: #FFFFFF;
-    font-size: 12.5px;
+    font-size: 14.5px;
     font-weight: 800;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
@@ -1572,7 +1572,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
+    font-size: 30px;
     box-shadow: 0 4px 10px rgba(142, 172, 205, 0.15);
 }
 
@@ -1589,7 +1589,7 @@ body {
 }
 
 .profile-name {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 800;
     color: var(--text-navy);
 }
@@ -1597,7 +1597,7 @@ body {
 .profile-badge {
     background: #E8F5E9;
     color: #2E7D32;
-    font-size: 9.5px;
+    font-size: 11.5px;
     font-weight: 800;
     padding: 2px 8px;
     border-radius: 10px;
@@ -1605,7 +1605,7 @@ body {
 }
 
 .profile-status {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-muted);
 }
 
@@ -1614,7 +1614,7 @@ body {
     border: 1px solid rgba(66, 165, 245, 0.2);
     border-radius: 12px;
     color: #1976D2;
-    font-size: 10.5px;
+    font-size: 12.5px;
     font-weight: 700;
     padding: 6px 12px;
     cursor: pointer;
@@ -1650,7 +1650,7 @@ body {
 .profile-level-label {
     display: flex;
     justify-content: space-between;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     color: var(--text-muted);
 }
@@ -1672,7 +1672,7 @@ body {
 
 /* Preference Toggles */
 .section-sub-title {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 800;
     color: var(--text-navy);
     margin-bottom: 10px;
@@ -1693,7 +1693,7 @@ body {
     border: 1px solid rgba(26, 35, 126, 0.08);
     border-radius: 16px;
     padding: 8px 14px;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text-muted);
     cursor: pointer;
@@ -1739,18 +1739,18 @@ body {
 }
 
 .my-stat-emoji {
-    font-size: 18px;
+    font-size: 21px;
 }
 
 .my-stat-val {
     font-family: 'Outfit', sans-serif;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 800;
     color: var(--text-navy);
 }
 
 .my-stat-label {
-    font-size: 9px;
+    font-size: 11px;
     color: var(--text-muted);
     font-weight: 700;
 }
@@ -1781,7 +1781,7 @@ body {
     align-self: flex-start;
     background: linear-gradient(135deg, #00C6FF 0%, #0072FF 100%);
     color: #FFFFFF;
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 800;
     padding: 2px 8px;
     border-radius: 20px;
@@ -1790,13 +1790,13 @@ body {
 }
 
 .sub-card-title {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 800;
     color: var(--text-navy);
 }
 
 .sub-card-desc {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-muted);
     line-height: 1.45;
 }
@@ -1871,13 +1871,13 @@ body {
 }
 
 .tier-name {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text-navy);
 }
 
 .tier-price {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--text-muted);
 }
@@ -1892,7 +1892,7 @@ body {
 }
 
 .tier-badge {
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 700;
     color: #0288D1;
     background: #E1F5FE;
@@ -1913,7 +1913,7 @@ body {
     border-radius: 14px;
     padding: 12px;
     color: #FFFFFF;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 800;
     cursor: pointer;
     transition: var(--transition-smooth);
@@ -1950,7 +1950,7 @@ body {
 }
 
 .roadmap-icon {
-    font-size: 22px;
+    font-size: 25px;
 }
 
 .roadmap-info {
@@ -1960,13 +1960,13 @@ body {
 }
 
 .roadmap-title {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 800;
     color: var(--text-navy);
 }
 
 .roadmap-desc {
-    font-size: 9.5px;
+    font-size: 11.5px;
     color: var(--text-muted);
     line-height: 1.4;
 }
@@ -2028,7 +2028,7 @@ body {
 }
 
 .verif-item-emoji {
-    font-size: 18px;
+    font-size: 21px;
     width: 32px;
     height: 32px;
     display: flex;
@@ -2046,7 +2046,7 @@ body {
     background: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
     padding: 6px 10px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text-navy);
     transition: all 0.2s ease;
@@ -2072,7 +2072,7 @@ body {
     width: 24px;
     border: none;
     background: transparent;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     color: #E53935;
     text-align: center;
@@ -2096,7 +2096,7 @@ body {
 }
 
 .verif-dday-label {
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 800;
     color: var(--text-muted);
 }
@@ -2104,7 +2104,7 @@ body {
 .btn-verif-delete {
     background: none;
     border: none;
-    font-size: 14px;
+    font-size: 16px;
     cursor: pointer;
     padding: 6px;
     display: flex;
@@ -2131,7 +2131,7 @@ body {
     border: 1.5px dashed rgba(26, 35, 126, 0.25);
     border-radius: 14px;
     padding: 11px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text-navy);
     cursor: pointer;
@@ -2150,7 +2150,7 @@ body {
     border: none;
     border-radius: 14px;
     padding: 11px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     color: #FFFFFF;
     cursor: pointer;
@@ -2177,13 +2177,13 @@ body {
 }
 
 .verif-empty-state .empty-emoji {
-    font-size: 26px;
+    font-size: 30px;
     display: block;
     margin-bottom: 8px;
 }
 
 .verif-empty-state p {
-    font-size: 11px;
+    font-size: 13px;
     line-height: 1.6;
     font-weight: 600;
 }
@@ -2238,7 +2238,7 @@ body {
     padding-top: 6px;
     border-top: 1px dashed rgba(26, 35, 126, 0.08);
     color: var(--text-muted);
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     gap: 4px;
     cursor: pointer;
@@ -2252,7 +2252,7 @@ body {
 .recipe-expand-indicator .indicator-arrow {
     display: inline-block;
     transition: transform 0.3s ease;
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .recipe-card.expanded .recipe-expand-indicator .indicator-arrow {
@@ -2294,7 +2294,7 @@ body {
 }
 
 .ai-settings-label {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 800;
     color: var(--text-navy);
 }
@@ -2310,7 +2310,7 @@ body {
     background: rgba(255, 255, 255, 0.9);
     border-radius: 12px;
     padding: 10px 14px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text-navy);
     transition: all 0.2s ease;
@@ -2335,7 +2335,7 @@ body {
     border-radius: 14px;
     padding: 12px;
     color: #FFFFFF;
-    font-size: 12.5px;
+    font-size: 14.5px;
     font-weight: 800;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
@@ -2375,18 +2375,18 @@ body {
 }
 
 .ai-gen-icon {
-    font-size: 20px;
+    font-size: 23px;
 }
 
 .ai-gen-title {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 800;
     color: var(--text-navy);
 }
 
 .ai-gen-model-tag {
     font-family: 'Outfit', sans-serif;
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 800;
     background: rgba(30, 136, 229, 0.1);
     color: #1E88E5;
@@ -2396,7 +2396,7 @@ body {
 }
 
 .ai-gen-desc {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-muted);
     line-height: 1.5;
 }
@@ -2408,7 +2408,7 @@ body {
     border-radius: 14px;
     padding: 10px;
     color: var(--text-navy);
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 800;
     cursor: pointer;
     transition: var(--transition-smooth);
@@ -2428,7 +2428,7 @@ body {
     border-radius: 14px;
     padding: 12px;
     color: #FFFFFF;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(26, 35, 126, 0.25);
@@ -2519,7 +2519,7 @@ body {
 }
 
 .ai-spinner-icon {
-    font-size: 32px;
+    font-size: 37px;
     animation: pulse-glow 2s ease-in-out infinite;
 }
 
@@ -2540,13 +2540,13 @@ body {
 }
 
 .ai-loading-title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 900;
     color: var(--text-navy);
 }
 
 .ai-loading-desc {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-muted);
     line-height: 1.6;
     min-height: 36px;
@@ -2566,7 +2566,7 @@ body {
 }
 
 .loading-step {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     color: var(--text-muted);
     transition: all 0.3s ease;
@@ -2607,7 +2607,7 @@ body {
 }
 
 .fridge-group-title {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 800;
     color: var(--text-navy);
     display: flex;
@@ -2619,7 +2619,7 @@ body {
 .fridge-group-count {
     background: rgba(26, 35, 126, 0.06);
     color: var(--text-navy);
-    font-size: 10.5px;
+    font-size: 12.5px;
     font-weight: 800;
     padding: 3px 10px;
     border-radius: 20px;
@@ -2684,7 +2684,7 @@ body {
 }
 
 .urgent-icon {
-    font-size: 18px;
+    font-size: 21px;
     animation: wiggle 1s infinite;
 }
 
@@ -2695,7 +2695,7 @@ body {
 }
 
 .urgent-title {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 850;
     color: #880E4F;
     letter-spacing: -0.3px;
@@ -2703,7 +2703,7 @@ body {
 
 .urgent-count {
     margin-left: auto;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     background: rgba(233, 30, 99, 0.15);
     color: #C2185B;
@@ -2744,11 +2744,11 @@ body {
 }
 
 .urgent-item-emoji {
-    font-size: 24px;
+    font-size: 28px;
 }
 
 .urgent-item-name {
-    font-size: 11.5px;
+    font-size: 13.5px;
     font-weight: 700;
     color: #37474F;
     white-space: nowrap;
@@ -2758,7 +2758,7 @@ body {
 }
 
 .urgent-item-badge {
-    font-size: 9px !important;
+    font-size: 11px !important;
     padding: 1.5px 6px !important;
     border-radius: 6px !important;
 }
@@ -2789,7 +2789,7 @@ body {
 }
 
 .pref-card-title {
-    font-size: 15.5px;
+    font-size: 18px;
     font-weight: 800;
     color: var(--text-navy);
     margin-bottom: 6px;
@@ -2799,7 +2799,7 @@ body {
 }
 
 .pref-card-desc {
-    font-size: 11.5px;
+    font-size: 13.5px;
     color: var(--text-muted);
     margin-bottom: 14px;
     line-height: 1.45;
@@ -2820,7 +2820,7 @@ body {
     border: none;
     outline: none;
     cursor: pointer;
-    font-size: 12.5px;
+    font-size: 14.5px;
     font-weight: 700;
     color: var(--text-muted);
     padding: 10px 4px;
@@ -2848,7 +2848,7 @@ body {
     border-radius: 14px;
     padding: 12px 8px;
     cursor: pointer;
-    font-size: 12.5px;
+    font-size: 14.5px;
     font-weight: 700;
     color: var(--text-muted);
     display: flex;
@@ -2867,7 +2867,7 @@ body {
 }
 
 .pref-allergy-chip .chip-icon {
-    font-size: 16px;
+    font-size: 18px;
     transition: transform 0.25s;
 }
 
@@ -2895,7 +2895,7 @@ body {
 }
 
 .pref-sub-label {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 800;
     color: var(--text-navy);
     padding-left: 2px;
@@ -2906,7 +2906,7 @@ body {
     border: 1.5px solid rgba(26, 35, 126, 0.12);
     border-radius: 12px;
     padding: 10px 14px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--text-navy);
     outline: none;
@@ -2928,14 +2928,14 @@ body {
     border: 1px solid rgba(76, 175, 80, 0.2);
     border-radius: 14px;
     padding: 12px;
-    font-size: 11.5px;
+    font-size: 13.5px;
     font-weight: 750;
     color: #2E7D32;
     box-shadow: 0 4px 15px rgba(76, 175, 80, 0.05);
 }
 
 .save-status-icon {
-    font-size: 14px;
+    font-size: 16px;
     animation: bounce 1.5s infinite;
 }
 
@@ -2958,7 +2958,7 @@ body {
 }
 
 .sub-benefit-icon {
-    font-size: 18px;
+    font-size: 21px;
     margin-top: 1px;
 }
 
@@ -2969,13 +2969,13 @@ body {
 }
 
 .benefit-title {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     color: var(--text-navy);
 }
 
 .benefit-desc {
-    font-size: 10px;
+    font-size: 12px;
     color: var(--text-muted);
     line-height: 1.4;
 }
@@ -3007,7 +3007,7 @@ body {
     border: 1.5px solid rgba(26, 35, 126, 0.08);
     border-radius: 30px;
     padding: 8px 16px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text-muted);
     cursor: pointer;
@@ -3033,7 +3033,7 @@ body {
 }
 
 .teacher-chip-emoji {
-    font-size: 15px;
+    font-size: 17px;
     transition: transform 0.2s;
 }
 
@@ -3057,12 +3057,12 @@ body {
 }
 
 .teacher-empty-state .empty-icon {
-    font-size: 28px;
+    font-size: 32px;
     animation: pulse 2s infinite;
 }
 
 .teacher-empty-state p {
-    font-size: 11.5px;
+    font-size: 13.5px;
     font-weight: 700;
     margin: 0;
 }
@@ -3096,7 +3096,7 @@ body {
 }
 
 .guide-emoji-badge {
-    font-size: 18px;
+    font-size: 21px;
     background: rgba(255, 255, 255, 0.9);
     width: 32px;
     height: 32px;
@@ -3108,13 +3108,13 @@ body {
 }
 
 .guide-ingredient-name {
-    font-size: 13.5px;
+    font-size: 15.5px;
     font-weight: 800;
     color: var(--text-navy);
 }
 
 .guide-effect-badge {
-    font-size: 9.5px;
+    font-size: 11.5px;
     font-weight: 850;
     color: #2E7D32;
     background: #E8F5E9;
@@ -3125,7 +3125,7 @@ body {
 }
 
 .guide-card-tips {
-    font-size: 11.5px;
+    font-size: 13.5px;
     color: #37474F;
     line-height: 1.55;
     font-weight: 600;
@@ -3160,19 +3160,19 @@ body {
 }
 
 .teacher-lock-card .lock-icon {
-    font-size: 32px;
+    font-size: 37px;
     animation: wiggle 1.2s infinite ease-in-out;
 }
 
 .teacher-lock-card .lock-title {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 800;
     color: #4A148C;
     margin: 0;
 }
 
 .teacher-lock-card .lock-desc {
-    font-size: 11px;
+    font-size: 13px;
     color: #5E35B1;
     line-height: 1.5;
     margin: 0;
@@ -3185,7 +3185,7 @@ body {
     border-radius: 12px;
     padding: 12px;
     color: #FFFFFF;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(123, 31, 162, 0.3);
@@ -3243,7 +3243,7 @@ body {
     background: rgba(26, 35, 126, 0.04);
     border: 1px solid rgba(26, 35, 126, 0.08);
     border-radius: 10px;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text-muted);
     cursor: pointer;
@@ -3285,7 +3285,7 @@ body {
 }
 
 .barcode-icon {
-    font-size: 48px;
+    font-size: 55px;
     opacity: 0.85;
     z-index: 1;
     animation: barcodePulse 2s infinite ease-in-out;
@@ -3311,7 +3311,7 @@ body {
 .btn-barcode-scan {
     background: linear-gradient(135deg, #FFB300 0%, #FF8F00 100%);
     color: #3E2723;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     padding: 12px 20px;
     border: none;
@@ -3360,11 +3360,11 @@ body {
 }
 
 .fav-chip-emoji {
-    font-size: 20px;
+    font-size: 23px;
 }
 
 .fav-chip-name {
-    font-size: 10.5px;
+    font-size: 12.5px;
     font-weight: 700;
     color: var(--text-navy);
 }
@@ -3373,7 +3373,7 @@ body {
     position: absolute;
     top: 4px;
     right: 6px;
-    font-size: 10px;
+    font-size: 12px;
     color: white;
     background: #4CAF50;
     border-radius: 50%;
@@ -3406,7 +3406,7 @@ body {
     background: linear-gradient(135deg, #1A237E 0%, #303F9F 100%);
     color: white;
     border: none;
-    font-size: 11.5px;
+    font-size: 13.5px;
     font-weight: 800;
     padding: 12px;
     border-radius: 12px;
@@ -3431,7 +3431,7 @@ body {
 
 .recipe-substitutions-box .sub-title {
     display: block;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 800;
     color: #D84315;
     margin-bottom: 6px;
@@ -3444,7 +3444,7 @@ body {
 }
 
 .recipe-substitutions-box .sub-list li {
-    font-size: 10.5px;
+    font-size: 12.5px;
     line-height: 1.45;
     color: var(--text-muted);
     position: relative;
@@ -3478,14 +3478,14 @@ body {
 }
 
 .recipe-section-title {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 850;
     color: var(--text-navy);
     margin-bottom: 4px;
 }
 
 .recipe-section-subtitle {
-    font-size: 10.5px;
+    font-size: 12.5px;
     color: var(--text-muted);
     margin-bottom: 12px;
     line-height: 1.4;
@@ -3502,11 +3502,11 @@ body {
 }
 
 .placeholder-icon-mini {
-    font-size: 24px;
+    font-size: 28px;
 }
 
 .placeholder-desc-mini {
-    font-size: 10.5px;
+    font-size: 12.5px;
     color: var(--text-muted);
     line-height: 1.45;
     margin: 0;
@@ -3544,7 +3544,7 @@ body {
     border: none;
     outline: none;
     background: transparent;
-    font-size: 9.5px;
+    font-size: 11.5px;
     font-weight: 700;
     color: var(--text-muted);
     padding: 4px 8px;
@@ -3580,7 +3580,7 @@ body {
     border: var(--glass-border);
     border-radius: 16px;
     padding: 18px 12px;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--text-navy);
     cursor: pointer;
@@ -3606,17 +3606,17 @@ body {
 }
 
 .scan-grid-option-btn .grid-emoji {
-    font-size: 28px;
+    font-size: 32px;
 }
 
 .scan-grid-option-btn .grid-title {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--text-navy);
 }
 
 .scan-grid-option-btn .grid-desc {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--text-muted);
     line-height: 1.3;
@@ -3635,7 +3635,7 @@ body {
     background: rgba(26, 35, 126, 0.06);
     border: 1px solid rgba(26, 35, 126, 0.1);
     color: #1A237E;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     padding: 6px 10px;
     border-radius: 8px;
@@ -3698,7 +3698,7 @@ body {
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     color: var(--text-navy);
-    font-size: 9px;
+    font-size: 11px;
     outline: none;
 }
 
@@ -3729,7 +3729,7 @@ body {
 .cuisine-filter-chip {
     flex-shrink: 0;
     padding: 8px 16px;
-    font-size: 11.5px;
+    font-size: 13.5px;
     font-weight: 700;
     color: var(--text-navy);
     background: rgba(255, 255, 255, 0.5);
