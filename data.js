@@ -3,7 +3,10 @@ let ingredients = [
     { name: "대파", dday: 1, category: "채소", location: "채소칸", emoji: "🥬" },
     { name: "계란", dday: 3, category: "알류/유제품", location: "냉장실", emoji: "🥚" },
     { name: "양파", dday: 3, category: "채소", location: "채소칸", emoji: "🧅" },
-    { name: "두부", dday: 5, category: "두부/콩류", location: "냉장실", emoji: "🧈" }
+    { name: "두부", dday: 5, category: "두부/콩류", location: "냉장실", emoji: "🧈" },
+    { name: "비엔나 소세지", dday: 7, category: "육류", location: "냉장실", emoji: "🌭" },
+    { name: "애호박", dday: 4, category: "채소", location: "채소칸", emoji: "🥒" },
+    { name: "김치", dday: 14, category: "반찬/양념", location: "냉장실", emoji: "🌶️" }
 ];
 
 const mockScanResult = [
