@@ -1279,6 +1279,73 @@ function renderRecipeCardHTML(recipe, cardId, delayIndex) {
         `;
     }
 
+    // Generate AI Custom Preferences Guide Box
+    let prefGuideHTML = '';
+    
+    // Determine spiciness guide text
+    let spicinessTip = '';
+    if (userPreferencesState.spiciness === '아주순한맛') {
+        spicinessTip = `소금과 간장의 양을 살짝 줄이고, 자극적인 후추나 마늘은 최소화하여 자극 없이 담백하게 요리해 보세요.`;
+    } else if (userPreferencesState.spiciness === '순한맛') {
+        spicinessTip = `기본 고춧가루나 짠맛의 비중을 80%만 사용하여 속 편한 부드러운 맛을 즐기실 수 있습니다.`;
+    } else if (userPreferencesState.spiciness === '보통') {
+        spicinessTip = `오리지널 레시피 계량대로 조리하시는 것이 가장 균형 잡힌 맛을 냅니다.`;
+    } else if (userPreferencesState.spiciness === '매운맛') {
+        spicinessTip = `더욱 화끈한 풍미를 위해 조리 시 청양고추 1개를 썰어 넣거나, 고추기름 1스푼을 가볍게 둘러 조리해 보세요.`;
+    }
+
+    // Determine household size text
+    let householdTip = '';
+    if (userPreferencesState.householdSize === '1인 가구') {
+        householdTip = `1인 식단 최적화 소량 계량입니다. 남은 두부나 계란 등은 밀폐 보관팁을 참고해 밀봉 보관하세요.`;
+    } else if (userPreferencesState.householdSize === '2인 가구') {
+        householdTip = `두 명이 넉넉하게 즐기실 수 있도록 1.5 ~ 2배 수준으로 원활히 조절해 조리해 보시기 바랍니다.`;
+    } else if (userPreferencesState.householdSize === '3인 이상') {
+        householdTip = `가족형 식탁 분량입니다. 큰 프라이팬이나 냄비를 사용하시고, 기본 양념 계량을 2배 이상 증량하십시오.`;
+    }
+
+    // Determine diet type tag
+    let dietBadgeHTML = '';
+    let dietBadgeText = '';
+    const diet = userPreferencesState.dietType;
+    if (diet === '비건') {
+        dietBadgeText = '🥬 비건';
+    } else if (diet === '락토-오보') {
+        dietBadgeText = '🥚 락토-오보';
+    } else if (diet === '키토/저탄고지') {
+        dietBadgeText = '🥑 키토/저탄';
+    } else if (diet === '저당/다이어트') {
+        dietBadgeText = '🥗 다이어트';
+    } else if (diet === '글루텐프리') {
+        dietBadgeText = '🌾 글루텐프리';
+    } else {
+        dietBadgeText = '🍳 일반식';
+    }
+    
+    if (dietBadgeText) {
+        dietBadgeHTML = `<span class="recipe-meta-badge" style="background: rgba(26, 35, 126, 0.05); color: #1A237E; border: 1px solid rgba(26, 35, 126, 0.15);">${dietBadgeText}</span>`;
+    }
+
+    // Extra allergy and lactose tolerance info
+    let safeInfo = '';
+    if (userPreferencesState.lactoseIntolerant) {
+        safeInfo += `🥛 유당불내증 완화 프리. `;
+    }
+    if (userPreferencesState.allergies.nuts || userPreferencesState.allergies.meat) {
+        safeInfo += `🔒 알레르기 유발원 완벽 차단. `;
+    }
+
+    prefGuideHTML = `
+        <div class="recipe-pref-guide-box" style="margin-top: 12px; background: rgba(26, 35, 126, 0.02); border: 1px solid rgba(26, 35, 126, 0.06); border-radius: 12px; padding: 12px; font-size: 11px; color: var(--text-navy); line-height: 1.55;">
+            <div style="font-weight: 850; display: flex; align-items: center; gap: 6px; margin-bottom: 6px; color: #1A237E;">
+                <span>✨</span> AI 맞춤형 조리 제안 (내 설정 반영)
+            </div>
+            <div style="margin-bottom: 4px;">🧑‍🍳 <strong>가구 구성 (${userPreferencesState.householdSize}):</strong> ${householdTip}</div>
+            <div style="margin-bottom: 4px;">🌶️ <strong>맵기 단계 (${userPreferencesState.spiciness}):</strong> ${spicinessTip}</div>
+            ${safeInfo ? `<div style="color: #2E7D32;">🛡️ <strong>안심 가이드:</strong> ${safeInfo}</div>` : ''}
+        </div>
+    `;
+
     // Render HTML
     return `
         <div class="recipe-card collapsed" id="${cardId}" onclick="toggleRecipeCard('${cardId}')" style="animation-delay: ${delayIndex * 0.1}s">
@@ -1286,6 +1353,7 @@ function renderRecipeCardHTML(recipe, cardId, delayIndex) {
                 <span class="recipe-title">${recipe.title}</span>
                 <div class="recipe-meta-badges">
                     <span class="recipe-meta-badge" style="${urgencyClass} background: rgba(255,255,255,0.8); border: 1px solid currentColor;">${urgencyText}</span>
+                    ${dietBadgeHTML}
                     <span class="recipe-meta-badge">⚡ ${recipe.time}</span>
                     <span class="recipe-meta-badge">🔥 ${recipe.difficulty}</span>
                     <a href="${recipe.youtubeUrl || 'https://www.youtube.com/results?search_query=' + encodeURIComponent(recipe.title)}" target="_blank" rel="noopener noreferrer" class="recipe-meta-badge youtube-link" style="text-decoration: none; background: #FFEBEE; color: #D32F2F; border: 1px solid rgba(211, 47, 47, 0.15); transition: var(--transition-smooth);" onclick="event.stopPropagation()">
@@ -1321,7 +1389,7 @@ function renderRecipeCardHTML(recipe, cardId, delayIndex) {
                         `;
                     }).join('')}
             </div>
-
+ 
             <div class="recipe-steps-container">
                 <span class="recipe-steps-title">🍳 레시피 조리법</span>
                 ${recipe.steps.map((step, sIdx) => `
@@ -1331,10 +1399,13 @@ function renderRecipeCardHTML(recipe, cardId, delayIndex) {
                     </div>
                 `).join('')}
             </div>
-
+ 
+            <!-- AI Custom Preferences box injected! -->
+            ${prefGuideHTML}
+ 
             <!-- Alternative Substitutions box injected! -->
             ${subHTML}
-
+ 
             <div class="recipe-action-bar">
                 <button class="btn-rescue-success" onclick="event.stopPropagation(); executeRescue('${recipe.title}')">
                     🎉 식재료 구출 성공
@@ -1346,7 +1417,7 @@ function renderRecipeCardHTML(recipe, cardId, delayIndex) {
                     📤 공유
                 </button>
             </div>
-
+ 
             <div class="recipe-expand-indicator">
                 <span class="indicator-arrow">▼</span>
             </div>
@@ -1382,13 +1453,70 @@ function renderRecipePage(container) {
         <p class="page-subtitle">냉장고에 부재료 매수 없이, 오직 현재 있는 식재료만으로 100% 만드는 15분 식탁.</p>
     `;
     
-    // Filter recipes that can be made with current ingredients OR are the three default static recipes!
+    // Generate preference alert banner if any specific diet or filter is active
+    let prefAlertHTML = '';
+    const activeDiet = userPreferencesState.dietType;
+    const isLactose = userPreferencesState.lactoseIntolerant;
+    const currentSpicy = userPreferencesState.spiciness;
+    
+    if (activeDiet !== '일반식' || isLactose || currentSpicy !== '보통') {
+        const activeFilters = [];
+        if (activeDiet !== '일반식') activeFilters.push(`✨ ${activeDiet}`);
+        if (isLactose) activeFilters.push(`🥛 유당 프리`);
+        if (currentSpicy !== '보통') activeFilters.push(`🌶️ ${currentSpicy}`);
+        
+        prefAlertHTML = `
+            <div class="preferences-active-banner" style="display: flex; align-items: center; gap: 8px; background: rgba(26, 35, 126, 0.04); border: 1px solid rgba(26, 35, 126, 0.08); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; font-size: 11px; color: #1A237E; font-weight: 700; box-shadow: inset 0 1px 2px rgba(26, 35, 126, 0.02);">
+                <span>🎯</span>
+                <span>맞춤설정 반영 중: <strong>${activeFilters.join(', ')}</strong>에 최적화된 식단을 추천합니다.</span>
+            </div>
+        `;
+    }
+
+    // Filter recipes that can be made with current ingredients AND satisfy user preferences!
     const matchedRecipes = recipes.filter(recipe => {
         if (recipe.isAI) return true;
-        // The three core default recipes must always be displayed by default, even if the user deletes some ingredients
-        if (recipe.title === "대파계란볶음밥" || recipe.title === "소세지 볶음" || recipe.title === "애호박 된장찌개") return true;
-        // Other recipes are only matched if all required ingredients are in the current refrigerator
-        return recipe.ingredients.every(reqName => ingredients.some(myIng => myIng.name === reqName));
+        
+        // 1. Core Default Recipes Check
+        const isCoreDefault = recipe.title === "대파계란볶음밥" || recipe.title === "소세지 볶음" || recipe.title === "애호박 된장찌개";
+        
+        // Check ingredient match (unless core default)
+        if (!isCoreDefault) {
+            const hasAllIngredients = recipe.ingredients.every(reqName => ingredients.some(myIng => myIng.name === reqName));
+            if (!hasAllIngredients) return false;
+        }
+        
+        // 2. Diet Type Filter Checking
+        const diet = userPreferencesState.dietType;
+        if (diet === '비건') {
+            // 비건은 동물성 재료 완전 배제
+            const hasAnimalProduct = recipe.ingredients.some(ing => 
+                ['계란', '비엔나 소세지', '베이컨', '우유', '김치'].includes(ing)
+            );
+            if (hasAnimalProduct) return false;
+        } else if (diet === '락토-오보') {
+            // 락토-오보는 유제품/알류 허용, 육류 배제
+            const hasMeat = recipe.ingredients.some(ing => 
+                ['비엔나 소세지', '베이컨'].includes(ing)
+            );
+            if (hasMeat) return false;
+        }
+        
+        // 3. Lactose Intolerance Checking
+        if (userPreferencesState.lactoseIntolerant) {
+            // 유당불내증이 있으면 우유가 들어간 레시피 배제
+            if (recipe.ingredients.includes('우유')) return false;
+        }
+        
+        // 4. Allergy Checks (nuts, meat, etc.)
+        if (userPreferencesState.allergies.meat) {
+            const hasMeat = recipe.ingredients.some(ing => 
+                ['비엔나 소세지', '베이컨'].includes(ing)
+            );
+            if (hasMeat) return false;
+        }
+        
+        return true;
     });
     
     // Sort recipes by the minimum dday of their required ingredients (ascending - most urgent first)
@@ -1459,12 +1587,12 @@ function renderRecipePage(container) {
             <div class="placeholder-container" style="min-height: 250px; margin-top: 10px;">
                 <span class="placeholder-icon">🥣</span>
                 <h3 class="placeholder-title">해당 분야의 레시피가 없습니다</h3>
-                <p class="placeholder-desc">현재 선택하신 카테고리에 해당하는 레시피가 등록되어 있지 않습니다. 다른 카테고리를 터치해 보세요!</p>
+                <p class="placeholder-desc">현재 선택하신 맞춤설정과 보유 식재료에 해당하는 레시피가 없거나 제한되었습니다. 설정을 변경해 보세요!</p>
             </div>
         `;
     }
 
-    container.innerHTML = headerHTML + filterHTML + urgentHTML + generalHTML;
+    container.innerHTML = headerHTML + filterHTML + prefAlertHTML + urgentHTML + generalHTML;
 
     // 드래그 마우스 가로 스크롤 및 화살표 가시성 상태 관리 바인딩
     setTimeout(() => {
