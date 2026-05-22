@@ -1268,7 +1268,7 @@ function renderRecipeCardHTML(recipe, cardId, delayIndex) {
     if (availableSubs.length > 0) {
         subHTML = `
             <div class="recipe-substitutions-box">
-                <span class="sub-title">💡 MoEatzy의 초간단 대체재 제안</span>
+                <span class="sub-title" style="font-size: 16px; font-weight: 850;">💡 MoEatzy의 재료 대체안</span>
                 <ul class="sub-list">
                     ${availableSubs.map(ingName => {
                         const subs = substitutionDb[ingName].join(', ');
@@ -1336,13 +1336,13 @@ function renderRecipeCardHTML(recipe, cardId, delayIndex) {
     }
 
     prefGuideHTML = `
-        <div class="recipe-pref-guide-box" style="margin-top: 12px; background: rgba(26, 35, 126, 0.02); border: 1px solid rgba(26, 35, 126, 0.06); border-radius: 12px; padding: 12px; font-size: 11px; color: var(--text-navy); line-height: 1.55;">
-            <div style="font-weight: 850; display: flex; align-items: center; gap: 6px; margin-bottom: 6px; color: #1A237E;">
+        <div class="recipe-pref-guide-box" style="margin-top: 12px; background: rgba(26, 35, 126, 0.03); border: 1.5px solid rgba(26, 35, 126, 0.08); border-radius: 14px; padding: 14px; font-size: 14px; color: var(--text-navy); line-height: 1.6;">
+            <div style="font-weight: 850; display: flex; align-items: center; gap: 6px; margin-bottom: 8px; color: #1A237E; font-size: 16px;">
                 <span>✨</span> AI 맞춤형 조리 제안 (내 설정 반영)
             </div>
-            <div style="margin-bottom: 4px;">🧑‍🍳 <strong>가구 구성 (${userPreferencesState.householdSize}):</strong> ${householdTip}</div>
-            <div style="margin-bottom: 4px;">🌶️ <strong>맵기 단계 (${userPreferencesState.spiciness}):</strong> ${spicinessTip}</div>
-            ${safeInfo ? `<div style="color: #2E7D32;">🛡️ <strong>안심 가이드:</strong> ${safeInfo}</div>` : ''}
+            <div style="margin-bottom: 5px;">🧑‍🍳 <strong>가구 구성 (${userPreferencesState.householdSize}):</strong> ${householdTip}</div>
+            <div style="margin-bottom: 5px;">🌶️ <strong>맵기 단계 (${userPreferencesState.spiciness}):</strong> ${spicinessTip}</div>
+            ${safeInfo ? `<div style="color: #2E7D32; font-weight: 650;">🛡️ <strong>안심 가이드:</strong> ${safeInfo}</div>` : ''}
         </div>
     `;
 
@@ -1356,7 +1356,7 @@ function renderRecipeCardHTML(recipe, cardId, delayIndex) {
                     ${dietBadgeHTML}
                     <span class="recipe-meta-badge">⚡ ${recipe.time}</span>
                     <span class="recipe-meta-badge">🔥 ${recipe.difficulty}</span>
-                    <a href="${recipe.youtubeUrl || 'https://www.youtube.com/results?search_query=' + encodeURIComponent(recipe.title)}" target="_blank" rel="noopener noreferrer" class="recipe-meta-badge youtube-link" style="text-decoration: none; background: #FFEBEE; color: #D32F2F; border: 1px solid rgba(211, 47, 47, 0.15); transition: var(--transition-smooth);" onclick="event.stopPropagation()">
+                    <a href="${recipe.youtubeUrl || 'https://www.youtube.com/results?search_query=' + encodeURIComponent(recipe.title)}" target="_blank" rel="noopener noreferrer" class="recipe-meta-badge youtube-link" style="text-decoration: none; background: #FFEBEE; color: #D32F2F; border: 1.5px solid rgba(211, 47, 47, 0.35); transition: var(--transition-smooth); font-size: 13.5px; padding: 5px 12px; font-weight: 850; box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15); display: inline-flex; align-items: center; gap: 4px;" onclick="event.stopPropagation()">
                         <span>▶️</span> 영상 가이드
                     </a>
                 </div>

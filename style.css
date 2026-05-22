@@ -3431,7 +3431,7 @@ body {
 
 .recipe-substitutions-box .sub-title {
     display: block;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 800;
     color: #D84315;
     margin-bottom: 6px;
@@ -3444,7 +3444,7 @@ body {
 }
 
 .recipe-substitutions-box .sub-list li {
-    font-size: 12.5px;
+    font-size: 14.5px;
     line-height: 1.45;
     color: var(--text-muted);
     position: relative;
