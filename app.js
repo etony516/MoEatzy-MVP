@@ -763,8 +763,9 @@ function renderRecipePage(container) {
         <p class="page-subtitle">냉장고에 부재료 매수 없이, 오직 현재 있는 식재료만으로 100% 만드는 15분 식탁.</p>
     `;
     
-    // Filter recipes that can be made with current ingredients
+    // Filter recipes that can be made with current ingredients OR are AI-generated (since AI already generates them using current ingredients!)
     const matchedRecipes = recipes.filter(recipe => {
+        if (recipe.isAI) return true;
         return recipe.ingredients.every(reqName => ingredients.some(myIng => myIng.name === reqName));
     });
     
@@ -1104,6 +1105,9 @@ async function generateAIRecipe() {
         
         // Reverse array before unshifting so they are inserted in their correct logical order (first recipe at the top)
         [...newRecipes].reverse().forEach(aiRecipeObj => {
+            // Mark as AI-generated to bypass strict mock filtering
+            aiRecipeObj.isAI = true;
+            
             // Add dynamic YouTube Search URL for bulletproof integration
             aiRecipeObj.youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(aiRecipeObj.title)}`;
             
