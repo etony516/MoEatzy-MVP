@@ -1357,15 +1357,23 @@ function renderRecipeCardHTML(recipe, cardId, delayIndex) {
 function renderRecipePage(container) {
     const cuisines = ['한정식', '중식', '양식', '일본식', '분식', '디저트'];
     const filterHTML = `
-        <div class="cuisine-filter-container">
-            ${cuisines.map(cuisine => {
-                const isActive = selectedCuisineFilter === cuisine;
-                return `
-                    <button class="cuisine-filter-chip ${isActive ? 'active' : ''}" onclick="selectCuisineFilter('${cuisine}')">
-                        ${cuisine}
-                    </button>
-                `;
-            }).join('')}
+        <div class="cuisine-filter-wrapper">
+            <button class="cuisine-filter-arrow left" onclick="scrollCuisineFilter(-120)">
+                <span>◀</span>
+            </button>
+            <div class="cuisine-filter-container" id="cuisine-filter-container" onwheel="handleCuisineFilterWheel(event)">
+                ${cuisines.map(cuisine => {
+                    const isActive = selectedCuisineFilter === cuisine;
+                    return `
+                        <button class="cuisine-filter-chip ${isActive ? 'active' : ''}" onclick="selectCuisineFilter('${cuisine}')">
+                            ${cuisine}
+                        </button>
+                    `;
+                }).join('')}
+            </div>
+            <button class="cuisine-filter-arrow right" onclick="scrollCuisineFilter(120)">
+                <span>▶</span>
+            </button>
         </div>
     `;
 
@@ -1454,6 +1462,72 @@ function renderRecipePage(container) {
     }
 
     container.innerHTML = headerHTML + filterHTML + urgentHTML + generalHTML;
+
+    // 드래그 마우스 가로 스크롤 및 화살표 가시성 상태 관리 바인딩
+    setTimeout(() => {
+        const filterContainer = document.getElementById('cuisine-filter-container');
+        const wrapper = filterContainer ? filterContainer.parentElement : null;
+        if (!filterContainer) return;
+
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        filterContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            filterContainer.classList.add('dragging');
+            startX = e.pageX - filterContainer.offsetLeft;
+            scrollLeft = filterContainer.scrollLeft;
+        });
+
+        filterContainer.addEventListener('mouseleave', () => {
+            isDown = false;
+            filterContainer.classList.remove('dragging');
+        });
+
+        filterContainer.addEventListener('mouseup', () => {
+            isDown = false;
+            filterContainer.classList.remove('dragging');
+        });
+
+        filterContainer.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - filterContainer.offsetLeft;
+            const walk = (x - startX) * 1.5; // 드래그 가속도 조정
+            filterContainer.scrollLeft = scrollLeft - walk;
+        });
+
+        // 좌우 스크롤 한계에 따라 화살표 보임/숨김 처리
+        const updateArrows = () => {
+            if (!wrapper) return;
+            const leftArrow = wrapper.querySelector('.cuisine-filter-arrow.left');
+            const rightArrow = wrapper.querySelector('.cuisine-filter-arrow.right');
+            
+            const maxScrollLeft = filterContainer.scrollWidth - filterContainer.clientWidth;
+            
+            if (leftArrow) {
+                if (filterContainer.scrollLeft <= 3) {
+                    leftArrow.classList.add('hidden');
+                } else {
+                    leftArrow.classList.remove('hidden');
+                }
+            }
+            if (rightArrow) {
+                if (filterContainer.scrollLeft >= maxScrollLeft - 3) {
+                    rightArrow.classList.add('hidden');
+                } else {
+                    rightArrow.classList.remove('hidden');
+                }
+            }
+        };
+
+        filterContainer.addEventListener('scroll', updateArrows);
+        // 초기화 시 확인
+        updateArrows();
+        // 리사이즈 시 가시성 갱신
+        window.addEventListener('resize', updateArrows);
+    }, 50);
 }
 
 function selectCuisineFilter(cuisine) {
@@ -1463,6 +1537,22 @@ function selectCuisineFilter(cuisine) {
         renderRecipePage(contentArea);
     }
 }
+
+function scrollCuisineFilter(offset) {
+    const container = document.getElementById('cuisine-filter-container');
+    if (container) {
+        container.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+}
+
+function handleCuisineFilterWheel(event) {
+    event.preventDefault();
+    const container = document.getElementById('cuisine-filter-container');
+    if (container) {
+        container.scrollLeft += event.deltaY * 0.8; // 휠 속도 보정
+    }
+}
+
 
 /**
  * Extract raw JSON string from a potentially decorated conversational response text

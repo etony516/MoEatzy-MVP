@@ -3606,18 +3606,78 @@ body {
    레시피 카테고리 필터 스타일 (4차 고도화)
    ========================================================================== */
 
+.cuisine-filter-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
 .cuisine-filter-container {
     display: flex;
     gap: 8px;
     overflow-x: auto;
-    padding: 4px 4px 12px 4px;
-    margin-bottom: 16px;
+    padding: 6px 4px 12px 4px;
+    width: 100%;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none; /* Firefox */
+    cursor: grab;
+    user-select: none;
+}
+
+.cuisine-filter-container.dragging {
+    cursor: grabbing;
 }
 
 .cuisine-filter-container::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
+}
+
+/* Glassmorphic Arrows */
+.cuisine-filter-arrow {
+    position: absolute;
+    top: calc(50% - 6px); /* padding 하단 여백 보정 */
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    border: var(--glass-border);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--text-navy);
+    font-size: 9px;
+    outline: none;
+}
+
+.cuisine-filter-arrow.left {
+    left: -10px;
+}
+
+.cuisine-filter-arrow.right {
+    right: -10px;
+}
+
+.cuisine-filter-arrow:hover {
+    background: #FFFFFF;
+    box-shadow: 0 4px 14px rgba(26, 35, 126, 0.2);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.cuisine-filter-arrow:active {
+    transform: translateY(-50%) scale(0.92);
+}
+
+.cuisine-filter-arrow.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) scale(0.8);
 }
 
 .cuisine-filter-chip {
@@ -3651,6 +3711,7 @@ body {
     box-shadow: 0 4px 14px rgba(26, 35, 126, 0.25);
     font-weight: 850;
 }
+
 
 
 
