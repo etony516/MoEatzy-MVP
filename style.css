@@ -3177,4 +3177,346 @@ body {
     }
 }
 
+/* ==========================================================================
+   MoEatzy Advanced Feature Extensions (2차 기능 고도화 스타일)
+   ========================================================================== */
+
+.scan-modal-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    border-bottom: 1.5px solid rgba(26, 35, 126, 0.08);
+    padding-bottom: 10px;
+    overflow-x: auto;
+}
+
+.scan-tab-btn {
+    flex: 1;
+    white-space: nowrap;
+    padding: 8px 12px;
+    background: rgba(26, 35, 126, 0.04);
+    border: 1px solid rgba(26, 35, 126, 0.08);
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.scan-tab-btn:hover {
+    background: rgba(26, 35, 126, 0.08);
+    color: var(--text-navy);
+}
+
+.scan-tab-btn.active {
+    background: linear-gradient(135deg, #1A237E 0%, #303F9F 100%);
+    border-color: #1A237E;
+    color: white;
+    box-shadow: 0 4px 10px rgba(26, 35, 126, 0.15);
+}
+
+.barcode-scanner-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin: 12px 0;
+}
+
+.barcode-viewfinder {
+    width: 100%;
+    max-width: 280px;
+    height: 140px;
+    border: 2px solid rgba(26, 35, 126, 0.2);
+    border-radius: 16px;
+    position: relative;
+    background: rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.barcode-icon {
+    font-size: 48px;
+    opacity: 0.85;
+    z-index: 1;
+    animation: barcodePulse 2s infinite ease-in-out;
+}
+
+.barcode-laser {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, rgba(229, 57, 53, 0) 0%, rgba(229, 57, 53, 1) 50%, rgba(229, 57, 53, 0) 100%);
+    box-shadow: 0 0 8px rgba(229, 57, 53, 0.8);
+    z-index: 2;
+    opacity: 0;
+}
+
+.barcode-laser.scanning {
+    opacity: 1;
+    animation: barcodeScanLaser 1.5s infinite linear;
+}
+
+.btn-barcode-scan {
+    background: linear-gradient(135deg, #FFB300 0%, #FF8F00 100%);
+    color: #3E2723;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(255, 179, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-barcode-scan:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(255, 179, 0, 0.3);
+}
+
+.btn-barcode-scan:active {
+    transform: translateY(0);
+}
+
+.favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 12px 0;
+    max-height: 180px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.fav-chip-item {
+    background: rgba(26, 35, 126, 0.04);
+    border: 1px solid rgba(26, 35, 126, 0.08);
+    border-radius: 12px;
+    padding: 10px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fav-chip-item:hover {
+    background: rgba(26, 35, 126, 0.08);
+    transform: translateY(-1px);
+}
+
+.fav-chip-emoji {
+    font-size: 20px;
+}
+
+.fav-chip-name {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--text-navy);
+}
+
+.fav-chip-check {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 10px;
+    color: white;
+    background: #4CAF50;
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: all 0.2s ease;
+}
+
+.fav-chip-item.active {
+    background: rgba(26, 35, 126, 0.08);
+    border-color: #3f51b5;
+    box-shadow: 0 0 0 1.5px #3f51b5;
+}
+
+.fav-chip-item.active .fav-chip-check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.favorites-actions {
+    margin-top: 14px;
+}
+
+.btn-favorites-add {
+    background: linear-gradient(135deg, #1A237E 0%, #303F9F 100%);
+    color: white;
+    border: none;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 12px;
+    border-radius: 12px;
+    width: 100%;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(26, 35, 126, 0.2);
+    transition: transform 0.2s;
+}
+
+.btn-favorites-add:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(26, 35, 126, 0.25);
+}
+
+.recipe-substitutions-box {
+    background: rgba(255, 112, 67, 0.04);
+    border: 1px dashed rgba(255, 112, 67, 0.3);
+    border-radius: 12px;
+    padding: 12px;
+    margin: 12px 0;
+}
+
+.recipe-substitutions-box .sub-title {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: #D84315;
+    margin-bottom: 6px;
+}
+
+.recipe-substitutions-box .sub-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recipe-substitutions-box .sub-list li {
+    font-size: 10.5px;
+    line-height: 1.45;
+    color: var(--text-muted);
+    position: relative;
+    padding-left: 10px;
+    margin-bottom: 4px;
+}
+
+.recipe-substitutions-box .sub-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #FF7043;
+}
+
+.recipe-substitutions-box .sub-list li strong {
+    color: var(--text-navy);
+}
+
+.recipe-substitutions-box .sub-list li span {
+    color: #FF7043;
+    font-weight: 700;
+}
+
+.recipe-section-box {
+    background: rgba(255, 255, 255, 0.65);
+    border: var(--glass-border);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: var(--glass-shadow);
+    margin-bottom: 16px;
+}
+
+.recipe-section-title {
+    font-size: 13px;
+    font-weight: 850;
+    color: var(--text-navy);
+    margin-bottom: 4px;
+}
+
+.recipe-section-subtitle {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.placeholder-container-mini {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(26, 35, 126, 0.02);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(26, 35, 126, 0.05);
+}
+
+.placeholder-icon-mini {
+    font-size: 24px;
+}
+
+.placeholder-desc-mini {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    line-height: 1.45;
+    margin: 0;
+}
+
+@keyframes barcodeScanLaser {
+    0% { top: 0%; }
+    50% { top: 100%; }
+    100% { top: 0%; }
+}
+
+@keyframes barcodePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+}
+
+/* Card Right Container */
+.card-right-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Glassmorphic inline 3-pill quantity selector */
+.qty-pill-selector {
+    display: flex;
+    background: rgba(26, 35, 126, 0.04);
+    border: 1px solid rgba(26, 35, 126, 0.08);
+    border-radius: 20px;
+    padding: 2px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.qty-pill-btn {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 4px 8px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.qty-pill-btn:hover {
+    color: var(--text-navy);
+}
+
+.qty-pill-btn.active {
+    background: white;
+    color: #1A237E;
+    box-shadow: 0 2px 6px rgba(26, 35, 126, 0.15);
+    font-weight: 850;
+}
+
+
 

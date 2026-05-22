@@ -42,52 +42,62 @@ const freshnessStorageGuideDb = {
     "대파": {
         emoji: "🥬",
         tips: "송송 썬 파는 밀폐용기 바닥에 키친타월을 깔고 보관하면 수분이 흡수되어 오래 보관할 수 있습니다. 뿌리가 붙은 대파는 세워서 보관하세요.",
-        effect: "D-day +5일 연장 효과"
+        effect: "D-day +5일 연장 효과",
+        extendDays: 5
     },
     "계란": {
         emoji: "🥚",
         tips: "계란은 물로 씻지 않고 뾰족한 곳이 아래로 가게 꽂아 보관하세요. 냉장고 문 쪽 보다는 온도가 일정한 안쪽에 두는 것이 신선함 유지에 좋습니다.",
-        effect: "D-day +7일 연장 효과"
+        effect: "D-day +7일 연장 효과",
+        extendDays: 7
     },
     "양파": {
         emoji: "🧅",
         tips: "껍질을 벗기지 않은 양파는 통풍이 잘되는 망에 넣어 서늘한 상온에 두고, 깐양파는 수분을 제거한 뒤 랩으로 꼼꼼하게 낱개 포장해 냉장실에 넣으세요.",
-        effect: "D-day +10일 연장 효과"
+        effect: "D-day +10일 연장 효과",
+        extendDays: 10
     },
     "두부": {
         emoji: "🧈",
         tips: "남은 두부는 밀폐용기에 담아 두부가 완전히 잠기도록 깨끗한 수돗물이나 생수를 붓고 소금을 한 꼬집 뿌려 냉장 보관하면 3~4일 더 보관할 수 있습니다.",
-        effect: "D-day +4일 연장 효과"
+        effect: "D-day +4일 연장 효과",
+        extendDays: 4
     },
     "비엔나 소세지": {
         emoji: "🌭",
         tips: "칼집을 내어 뜨거운 물에 가볍게 데친 뒤 물기를 빼고 밀폐용기에 담아 냉장 보관하거나, 오래 두고 드실 경우 지퍼백에 넓게 펴서 냉동하세요.",
-        effect: "D-day +6일 연장 효과"
+        effect: "D-day +6일 연장 효과",
+        extendDays: 6
     },
     "애호박": {
         emoji: "🥒",
         tips: "물기를 완전히 말린 후 키친타월이나 랩으로 감싸 냉장실 채소칸에 줄기 쪽이 위를 향하도록 세워 두시면 무름 현상을 방지할 수 있습니다.",
-        effect: "D-day +5일 연장 효과"
+        effect: "D-day +5일 연장 효과",
+        extendDays: 5
     },
     "김치": {
         emoji: "🌶️",
         tips: "공기 노출을 차단하는 것이 가장 중요합니다. 김치가 국물 속에 완전히 잠기게 누름독으로 누르거나 위생 봉지를 덮어 냉장 온도를 0~2℃로 유지하세요.",
-        effect: "D-day +30일 연장 효과"
+        effect: "D-day +30일 연장 효과",
+        extendDays: 30
     },
     "새송이버섯": {
         emoji: "🍄",
         tips: "씻지 않은 채로 키친타월에 하나씩 말아서 밀폐용기나 위생팩에 담아 냉장실 채소칸에 넣어 두시면 습기 없이 뽀송하게 오래 유지됩니다.",
-        effect: "D-day +5일 연장 효과"
+        effect: "D-day +5일 연장 효과",
+        extendDays: 5
     },
     "우유": {
         emoji: "🥛",
         tips: "개봉한 우유는 집게나 집게 클립으로 공기 흡입을 막고 냉장고 문 쪽 칸 대신 온도 변화가 거의 없는 선반 중간이나 가장 안쪽에 보관하는 것이 현명합니다.",
-        effect: "D-day +3일 연장 효과"
+        effect: "D-day +3일 연장 효과",
+        extendDays: 3
     },
     "베이컨": {
         emoji: "🥓",
         tips: "개봉한 베이컨은 한 장씩 종이호일 위에 펼쳐서 샌드위치처럼 겹겹이 쌓아 올린 뒤 지퍼백에 밀폐해 냉동해 두면 한 장씩 꺼내 쓰기 좋습니다.",
-        effect: "D-day +7일 연장 효과"
+        effect: "D-day +7일 연장 효과",
+        extendDays: 7
     }
 };
 
@@ -300,6 +310,36 @@ const locationEmojis = {
 };
 
 /**
+ * Helper to render the inline 3-pill quantity selector and D-day badge inside ingredient cards
+ */
+function getCardRightHTML(item, badgeClass) {
+    const qty = item.quantity || '전체';
+    return `
+        <div class="card-right-container">
+            <div class="qty-pill-selector" onclick="event.stopPropagation()">
+                <button class="qty-pill-btn ${qty === '전체' ? 'active' : ''}" onclick="changeIngredientQty('${item.name}', '전체', event)">전체</button>
+                <button class="qty-pill-btn ${qty === '반' ? 'active' : ''}" onclick="changeIngredientQty('${item.name}', '반', event)">반</button>
+                <button class="qty-pill-btn ${qty === '조금 남음' ? 'active' : ''}" onclick="changeIngredientQty('${item.name}', '조금 남음', event)">조금</button>
+            </div>
+            <span class="dday-badge ${badgeClass}">D-${item.dday}</span>
+        </div>
+    `;
+}
+
+/**
+ * Controller to modify ingredient remaining quantity, trigger toast feedback, and instantly refresh view
+ */
+function changeIngredientQty(name, newQty, event) {
+    if (event) event.stopPropagation();
+    const item = ingredients.find(i => i.name === name);
+    if (item) {
+        item.quantity = newQty;
+        showToast(`'${name}'의 잔량이 '${newQty}'(으)로 변경되었습니다.`, '⚖️');
+        renderSortedIngredients();
+    }
+}
+
+/**
  * Sorts and draws ingredients based on the selected filter.
  * Category and Location filters render nested compartment boxes, while Freshness remains flat.
  */
@@ -378,9 +418,7 @@ function renderSortedIngredients() {
                             <span class="ingredient-location">${item.category} • ${item.location}</span>
                         </div>
                     </div>
-                    <div class="card-right">
-                        <span class="dday-badge ${badgeClass}">D-${item.dday}</span>
-                    </div>
+                    ${getCardRightHTML(item, badgeClass)}
                 </div>
             `;
             listContainer.insertAdjacentHTML('beforeend', cardHTML);
@@ -432,9 +470,7 @@ function renderSortedIngredients() {
                                 <span class="ingredient-location">위치: ${item.location}</span>
                             </div>
                         </div>
-                        <div class="card-right">
-                            <span class="dday-badge ${badgeClass}">D-${item.dday}</span>
-                        </div>
+                        ${getCardRightHTML(item, badgeClass)}
                     </div>
                 `;
             });
@@ -492,9 +528,7 @@ function renderSortedIngredients() {
                                 <span class="ingredient-location">종류: ${item.category}</span>
                             </div>
                         </div>
-                        <div class="card-right">
-                            <span class="dday-badge ${badgeClass}">D-${item.dday}</span>
-                        </div>
+                        ${getCardRightHTML(item, badgeClass)}
                     </div>
                 `;
             });
@@ -568,22 +602,57 @@ function initializeDynamicUI() {
                 <!-- Initial Option View -->
                 <div id="modal-initial-view">
                     <h3 class="modal-title">📸 AI 스마트 스캔</h3>
-                    <p class="modal-desc">영수증을 스캔하거나 냉장고 사진을 업로드하여 식재료를 자동으로 빠르게 채워보세요.</p>
-                    <div class="scan-options-container">
-                        <button class="scan-option-btn" onclick="startTechnicalScan('receipt')">
-                            <span class="emoji-icon">🧾</span>
-                            <div class="scan-option-info">
-                                <span class="scan-option-title">영수증 업로드 스캔</span>
-                                <span class="scan-option-desc">장보기 종이 영수증 글자 분석 등록</span>
+                    
+                    <!-- 3-tab navigation -->
+                    <div class="scan-modal-tabs">
+                        <button id="btn-scan-tab-image" class="scan-tab-btn active" onclick="switchScanTab('image')">📸 이미지 스캔</button>
+                        <button id="btn-scan-tab-barcode" class="scan-tab-btn" onclick="switchScanTab('barcode')">🏷️ 바코드 스캔</button>
+                        <button id="btn-scan-tab-favorites" class="scan-tab-btn" onclick="switchScanTab('favorites')">⭐ 자주 쓰는 재료</button>
+                    </div>
+                    
+                    <!-- Tab 1: Image Scan Content -->
+                    <div id="tab-content-image" class="scan-tab-content active">
+                        <p class="modal-desc" style="margin-top: 10px;">영수증을 스캔하거나 냉장고 사진을 업로드하여 식재료를 자동으로 빠르게 채워보세요.</p>
+                        <div class="scan-options-container">
+                            <button class="scan-option-btn" onclick="startTechnicalScan('receipt')">
+                                <span class="emoji-icon">🧾</span>
+                                <div class="scan-option-info">
+                                    <span class="scan-option-title">영수증 업로드 스캔</span>
+                                    <span class="scan-option-desc">장보기 종이 영수증 글자 분석 등록</span>
+                                </div>
+                            </button>
+                            <button class="scan-option-btn" onclick="startTechnicalScan('camera')">
+                                <span class="emoji-icon">🧊</span>
+                                <div class="scan-option-info">
+                                    <span class="scan-option-title">냉장고 촬영 스캔</span>
+                                    <span class="scan-option-desc">카메라 사진으로 냉장고 내부 식재료 판별</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Barcode Scan Content -->
+                    <div id="tab-content-barcode" class="scan-tab-content" style="display: none;">
+                        <p class="modal-desc" style="margin-top: 10px;">가공식품의 바코드를 스캔하여 편리하게 즉시 등록하세요.</p>
+                        <div class="barcode-scanner-area">
+                            <div class="barcode-viewfinder">
+                                <div class="barcode-laser"></div>
+                                <span class="barcode-icon">🥫</span>
+                                <div class="barcode-guide-lines"></div>
                             </div>
-                        </button>
-                        <button class="scan-option-btn" onclick="startTechnicalScan('camera')">
-                            <span class="emoji-icon">🧊</span>
-                            <div class="scan-option-info">
-                                <span class="scan-option-title">냉장고 촬영 스캔</span>
-                                <span class="scan-option-desc">카메라 사진으로 냉장고 내부 식재료 판별</span>
-                            </div>
-                        </button>
+                            <button class="btn-barcode-scan" onclick="simulateBarcodeScan()">🔍 바코드 스캔 시뮬레이션</button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Favorites Content -->
+                    <div id="tab-content-favorites" class="scan-tab-content" style="display: none;">
+                        <p class="modal-desc" style="margin-top: 10px;">자주 구매하는 단골 재료를 선택하고 하단의 버튼을 눌러 일괄 수납하세요.</p>
+                        <div class="favorites-grid" id="favorites-grid">
+                            <!-- Filled dynamically by renderFavoritesGrid() -->
+                        </div>
+                        <div class="favorites-actions">
+                            <button class="btn-favorites-add" onclick="addSelectedFavorites()">🛒 선택한 재료 검토창에 담기</button>
+                        </div>
                     </div>
                 </div>
 
@@ -702,8 +771,135 @@ function openScanModal() {
         const verifView = document.getElementById('modal-verification-view');
         if (verifView) verifView.style.display = 'none';
         
+        // Reset tabs to image tab
+        selectedFavorites = [];
+        switchScanTab('image');
+        
         overlay.classList.add('active');
     }
+}
+
+// ==========================================================================
+// Scan Tab Handlers (Image scan, Barcode scan, Favorites scan)
+// ==========================================================================
+
+const favoriteIngredientsDb = [
+    { name: "대파", emoji: "🥬", category: "채소", location: "채소칸", dday: 3 },
+    { name: "계란", emoji: "🥚", category: "알류/유제품", location: "냉장실", dday: 5 },
+    { name: "양파", emoji: "🧅", category: "채소", location: "채소칸", dday: 7 },
+    { name: "마늘", emoji: "🧄", category: "채소", location: "채소칸", dday: 14 },
+    { name: "두부", emoji: "🧈", category: "두부/콩류", location: "냉장실", dday: 5 },
+    { name: "김치", emoji: "🌶️", category: "반찬/양념", location: "냉장실", dday: 15 },
+    { name: "우유", emoji: "🥛", category: "알류/유제품", location: "냉장실", dday: 3 },
+    { name: "새송이버섯", emoji: "🍄", category: "채소", location: "채소칸", dday: 5 }
+];
+
+let selectedFavorites = [];
+
+function switchScanTab(tabName) {
+    // Hide all tab contents
+    document.getElementById('tab-content-image').style.display = 'none';
+    document.getElementById('tab-content-barcode').style.display = 'none';
+    document.getElementById('tab-content-favorites').style.display = 'none';
+    
+    // Remove active class from all buttons
+    const buttons = document.querySelectorAll('.scan-tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    // Show target content
+    if (tabName === 'image') {
+        document.getElementById('tab-content-image').style.display = 'block';
+        document.getElementById('btn-scan-tab-image').classList.add('active');
+    } else if (tabName === 'barcode') {
+        document.getElementById('tab-content-barcode').style.display = 'block';
+        document.getElementById('btn-scan-tab-barcode').classList.add('active');
+    } else if (tabName === 'favorites') {
+        document.getElementById('tab-content-favorites').style.display = 'block';
+        document.getElementById('btn-scan-tab-favorites').classList.add('active');
+        renderFavoritesGrid();
+    }
+}
+
+function renderFavoritesGrid() {
+    const grid = document.getElementById('favorites-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = favoriteIngredientsDb.map(ing => {
+        const isSelected = selectedFavorites.includes(ing.name);
+        return `
+            <div class="fav-chip-item ${isSelected ? 'active' : ''}" onclick="toggleFavoriteSelection(this, '${ing.name}')">
+                <span class="fav-chip-emoji">${ing.emoji}</span>
+                <span class="fav-chip-name">${ing.name}</span>
+                <span class="fav-chip-check">✓</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function toggleFavoriteSelection(el, name) {
+    const idx = selectedFavorites.indexOf(name);
+    if (idx !== -1) {
+        selectedFavorites.splice(idx, 1);
+        el.classList.remove('active');
+    } else {
+        selectedFavorites.push(name);
+        el.classList.add('active');
+    }
+}
+
+function addSelectedFavorites() {
+    if (selectedFavorites.length === 0) {
+        showToast('담을 자주 쓰는 재료를 선택해주세요!', '⚠️');
+        return;
+    }
+    
+    // Create new temp scan items
+    tempScanResults = selectedFavorites.map(name => {
+        const found = favoriteIngredientsDb.find(f => f.name === name);
+        return {
+            name: found.name,
+            dday: found.dday,
+            category: found.category,
+            location: found.location,
+            emoji: found.emoji,
+            quantity: "전체"
+        };
+    });
+    
+    // Clear selection
+    selectedFavorites = [];
+    
+    // Transition to verification view
+    document.getElementById('modal-initial-view').style.display = 'none';
+    document.getElementById('modal-verification-view').style.display = 'block';
+    renderScanVerificationScreen();
+    showToast(`자주 쓰는 재료 ${tempScanResults.length}건이 임시 수납되었습니다.`, '🛒');
+}
+
+function simulateBarcodeScan() {
+    const laser = document.querySelector('.barcode-laser');
+    if (laser) {
+        laser.classList.add('scanning');
+    }
+    
+    showToast('바코드 스캔 감지 중...', '🔍');
+    
+    setTimeout(() => {
+        if (laser) laser.classList.remove('scanning');
+        
+        // Mock scanned items representing processed foods with barcodes
+        tempScanResults = [
+            { name: "비엔나 소세지", dday: 7, category: "육류", location: "냉장실", emoji: "🌭", quantity: "전체" },
+            { name: "우유", dday: 3, category: "알류/유제품", location: "냉장실", emoji: "🥛", quantity: "전체" },
+            { name: "베이컨", dday: 5, category: "육류", location: "냉장실", emoji: "🥓", quantity: "전체" }
+        ];
+        
+        // Transition to verification view
+        document.getElementById('modal-initial-view').style.display = 'none';
+        document.getElementById('modal-verification-view').style.display = 'block';
+        renderScanVerificationScreen();
+        showToast('바코드 상품 정보 디코딩에 성공하였습니다!', '🥫');
+    }, 1500);
 }
 
 /**
@@ -915,6 +1111,13 @@ function renderScanVerificationScreen() {
         row.innerHTML = `
             <span class="verif-item-emoji" id="verif-emoji-${index}">${item.emoji || '🏷️'}</span>
             <input type="text" class="verif-input-name" value="${item.name}" placeholder="예: 새송이버섯" oninput="updateTempItemName(${index}, this.value)" />
+            <div class="verif-qty-wrapper">
+                <select class="verif-input-qty" onchange="updateTempItemQty(${index}, this.value)">
+                    <option value="전체" ${item.quantity === '전체' || !item.quantity ? 'selected' : ''}>전체</option>
+                    <option value="반" ${item.quantity === '반' ? 'selected' : ''}>반</option>
+                    <option value="조금 남음" ${item.quantity === '조금 남음' ? 'selected' : ''}>조금 남음</option>
+                </select>
+            </div>
             <div class="verif-dday-wrapper">
                 <input type="number" class="verif-input-dday" value="${item.dday}" min="1" max="99" oninput="updateTempItemDday(${index}, this.value)" />
                 <span class="verif-dday-label">D-Day</span>
@@ -923,6 +1126,15 @@ function renderScanVerificationScreen() {
         `;
         listEl.appendChild(row);
     });
+}
+
+/**
+ * Handler for editing the temporary quantity
+ */
+function updateTempItemQty(index, val) {
+    if (tempScanResults[index]) {
+        tempScanResults[index].quantity = val;
+    }
 }
 
 /**
@@ -973,7 +1185,8 @@ function addTempItem() {
         dday: 5,
         category: "기타",
         location: "냉장실",
-        emoji: "🏷️"
+        emoji: "🏷️",
+        quantity: "전체"
     });
     renderScanVerificationScreen();
 }
@@ -1018,10 +1231,128 @@ function finalizeScanRegistration() {
  * Render the AI Recipe screen with collapsible cards
  * @param {HTMLElement} container 
  */
-/**
- * Render the AI Recipe screen with collapsible cards
- * @param {HTMLElement} container 
- */
+const substitutionDb = {
+    "대파": ["쪽파", "양파", "부추"],
+    "계란": ["두부", "메추리알"],
+    "양파": ["대파", "양배추"],
+    "두부": ["계란", "순두부", "버섯"],
+    "비엔나 소세지": ["베이컨", "스팸", "어묵"],
+    "애호박": ["오이", "가지", "주키니호박"],
+    "김치": ["양배추김치", "깍두기"],
+    "새송이버섯": ["팽이버섯", "느타리버섯", "표고버섯"],
+    "우유": ["두유", "아몬드유", "생크림"],
+    "베이컨": ["비엔나 소세지", "삼겹살", "슬라이스 햄"]
+};
+
+function renderRecipeCardHTML(recipe, cardId, delayIndex) {
+    const recipeDdays = recipe.ingredients.map(ingName => {
+        const matched = ingredients.find(i => i.name === ingName);
+        return matched ? matched.dday : 999;
+    });
+    const minDdayVal = Math.min(...recipeDdays);
+    
+    let urgencyText = '🥬 신선함 유지 중';
+    let urgencyClass = 'color: #2E7D32;';
+    if (minDdayVal <= 1) {
+        urgencyText = '🚨 즉시 구출 필요';
+        urgencyClass = 'color: #C62828;';
+    } else if (minDdayVal <= 3) {
+        urgencyText = '⚠️ 오늘 구출 권장';
+        urgencyClass = 'color: #F57F17;';
+    }
+
+    // Generate Substitution Guide
+    let subHTML = '';
+    const availableSubs = recipe.ingredients.filter(ingName => substitutionDb[ingName]);
+    if (availableSubs.length > 0) {
+        subHTML = `
+            <div class="recipe-substitutions-box">
+                <span class="sub-title">💡 MoEatzy의 초간단 대체재 제안</span>
+                <ul class="sub-list">
+                    ${availableSubs.map(ingName => {
+                        const subs = substitutionDb[ingName].join(', ');
+                        return `<li><strong>${ingName}</strong> 대신 <span>${subs}</span>(으)로 요리해도 문제없어요!</li>`;
+                    }).join('')}
+                </ul>
+            </div>
+        `;
+    }
+
+    // Render HTML
+    return `
+        <div class="recipe-card collapsed" id="${cardId}" onclick="toggleRecipeCard('${cardId}')" style="animation-delay: ${delayIndex * 0.1}s">
+            <div class="recipe-card-header">
+                <span class="recipe-title">${recipe.title}</span>
+                <div class="recipe-meta-badges">
+                    <span class="recipe-meta-badge" style="${urgencyClass} background: rgba(255,255,255,0.8); border: 1px solid currentColor;">${urgencyText}</span>
+                    <span class="recipe-meta-badge">⚡ ${recipe.time}</span>
+                    <span class="recipe-meta-badge">🔥 ${recipe.difficulty}</span>
+                    <a href="${recipe.youtubeUrl || 'https://www.youtube.com/results?search_query=' + encodeURIComponent(recipe.title)}" target="_blank" rel="noopener noreferrer" class="recipe-meta-badge youtube-link" style="text-decoration: none; background: #FFEBEE; color: #D32F2F; border: 1px solid rgba(211, 47, 47, 0.15); transition: var(--transition-smooth);" onclick="event.stopPropagation()">
+                        <span>▶️</span> 영상 가이드
+                    </a>
+                </div>
+            </div>
+            
+            <div class="recipe-ingredients-required">
+                <span class="recipe-ing-title">구출 대상 식재료 (유통기한 임박순 정렬)</span>
+                ${recipe.ingredients
+                    .map(ingName => ingredients.find(i => i.name === ingName))
+                    .filter(ing => ing !== undefined)
+                    .sort((a, b) => a.dday - b.dday)
+                    .map(matchedIng => {
+                        const emoji = matchedIng.emoji;
+                        const name = matchedIng.name;
+                        const dday = matchedIng.dday;
+                        
+                        let tagStyle = 'background: #E8F5E9; color: #2E7D32; border: 1px solid rgba(46, 125, 50, 0.15);';
+                        if (dday <= 1) {
+                            tagStyle = 'background: #FFEBEE; color: #C62828; border: 1px solid rgba(198, 40, 40, 0.2); font-weight: 700;';
+                        } else if (dday <= 3) {
+                            tagStyle = 'background: #FFF8E1; color: #F57F17; border: 1px solid rgba(245, 127, 23, 0.2); font-weight: 700;';
+                        }
+                        
+                        return `
+                            <span class="recipe-ing-tag" style="${tagStyle} display: inline-flex; align-items: center; gap: 4px;">
+                                <span>${emoji}</span>
+                                <span>${name}</span>
+                                <span style="font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 4px; background: rgba(255,255,255,0.6); margin-left: 2px;">D-${dday}</span>
+                            </span>
+                        `;
+                    }).join('')}
+            </div>
+
+            <div class="recipe-steps-container">
+                <span class="recipe-steps-title">🍳 레시피 조리법</span>
+                ${recipe.steps.map((step, sIdx) => `
+                    <div class="recipe-step-item">
+                        <span class="step-number">${sIdx + 1}</span>
+                        <span class="step-text">${step}</span>
+                    </div>
+                `).join('')}
+            </div>
+
+            <!-- Alternative Substitutions box injected! -->
+            ${subHTML}
+
+            <div class="recipe-action-bar">
+                <button class="btn-rescue-success" onclick="event.stopPropagation(); executeRescue('${recipe.title}')">
+                    🎉 식재료 구출 성공
+                </button>
+                <button class="btn-rescue-fail" onclick="event.stopPropagation(); executeDiscard('${recipe.title}')">
+                    🗑️ 구출 실패
+                </button>
+                <button class="btn-recipe-share" onclick="event.stopPropagation(); showToast('레시피 공유 링크가 복사되었습니다!', '🔗')">
+                    📤 공유
+                </button>
+            </div>
+
+            <div class="recipe-expand-indicator">
+                <span class="indicator-arrow">▼</span>
+            </div>
+        </div>
+    `;
+}
+
 function renderRecipePage(container) {
     const aiGeneratorHTML = `
         <div class="ai-button-wrapper" style="margin-bottom: 24px;">
@@ -1054,109 +1385,72 @@ function renderRecipePage(container) {
         return getMinDday(a) - getMinDday(b);
     });
 
-    let listHTML = '';
-    if (sortedRecipes.length === 0) {
-        listHTML = `
+    // Bifurcate recipes: Urgent (D-3 or less required ingredients) vs General AI Recipes
+    const urgentRecipes = sortedRecipes.filter(recipe => {
+        return recipe.ingredients.some(ingName => {
+            const matched = ingredients.find(i => i.name === ingName);
+            return matched && matched.dday <= 3;
+        });
+    });
+
+    const generalRecipes = sortedRecipes.filter(recipe => {
+        return !recipe.ingredients.some(ingName => {
+            const matched = ingredients.find(i => i.name === ingName);
+            return matched && matched.dday <= 3;
+        });
+    });
+
+    let urgentHTML = '';
+    let generalHTML = '';
+
+    // Render Urgent Box
+    if (urgentRecipes.length > 0) {
+        urgentHTML = `
+            <div class="recipe-section-box urgent-section">
+                <h3 class="recipe-section-title">🚨 빨리 구출해야 해요! (임박 재료 사용 레시피)</h3>
+                <p class="recipe-section-subtitle">D-3 이하로 시들어가고 있는 유통기한 임박 식재료를 구출하는 초핵심 솔루션입니다.</p>
+                <div class="recipe-list">
+                    ${urgentRecipes.map((recipe, rIdx) => renderRecipeCardHTML(recipe, `recipe-card-urgent-${rIdx}`, rIdx)).join('')}
+                </div>
+            </div>
+        `;
+    } else {
+        urgentHTML = `
+            <div class="recipe-section-box urgent-section empty">
+                <h3 class="recipe-section-title">🚨 빨리 구출해야 해요! (임박 재료 사용 레시피)</h3>
+                <div class="placeholder-container-mini">
+                    <span class="placeholder-icon-mini">🥦</span>
+                    <p class="placeholder-desc-mini">현재 냉장고에 유통기한 D-3 이하인 임박 재료가 없거나 조리 가능한 임박 레시피가 없습니다. 아주 신선한 상태네요!</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // Render General Box
+    if (generalRecipes.length > 0 || urgentRecipes.length > 0) {
+        // Display other recipes as general AI recipes
+        const displayGeneral = generalRecipes.length > 0 ? generalRecipes : sortedRecipes;
+        const generalTitle = generalRecipes.length > 0 ? '🍳 전체 추천 AI 레시피' : '🍳 추천 레시피 전체 목록';
+        generalHTML = `
+            <div class="recipe-section-box general-section" style="margin-top: 24px;">
+                <h3 class="recipe-section-title">${generalTitle}</h3>
+                <p class="recipe-section-subtitle">보유하신 전체 식재료들을 골고루 활용해 즐길 수 있는 맛있는 한끼 레시피입니다.</p>
+                <div class="recipe-list">
+                    ${displayGeneral.map((recipe, rIdx) => renderRecipeCardHTML(recipe, `recipe-card-general-${rIdx}`, rIdx + urgentRecipes.length)).join('')}
+                </div>
+            </div>
+        `;
+    } else {
+        generalHTML = `
             <div class="placeholder-container" style="min-height: 250px; margin-top: 10px;">
                 <span class="placeholder-icon">🥣</span>
                 <h3 class="placeholder-title">구출 가능한 레시피가 없습니다</h3>
                 <p class="placeholder-desc">현재 보유 중인 재료가 소모되어 조리 가능한 요리가 없습니다. 상단 스캔 버튼을 눌러 새 식재료를 채워보세요!</p>
             </div>
         `;
-    } else {
-        listHTML = `<div class="recipe-list">`;
-        sortedRecipes.forEach((recipe, rIdx) => {
-            const recipeDdays = recipe.ingredients.map(ingName => {
-                const matched = ingredients.find(i => i.name === ingName);
-                return matched ? matched.dday : 999;
-            });
-            const minDdayVal = Math.min(...recipeDdays);
-            
-            let urgencyText = '🥬 신선함 유지 중';
-            let urgencyClass = 'color: #2E7D32;';
-            if (minDdayVal <= 1) {
-                urgencyText = '🚨 즉시 구출 필요';
-                urgencyClass = 'color: #C62828;';
-            } else if (minDdayVal <= 3) {
-                urgencyText = '⚠️ 오늘 구출 권장';
-                urgencyClass = 'color: #F57F17;';
-            }
-
-            listHTML += `
-                <div class="recipe-card collapsed" id="recipe-card-${rIdx}" onclick="toggleRecipeCard(${rIdx})" style="animation-delay: ${rIdx * 0.1}s">
-                    <div class="recipe-card-header">
-                        <span class="recipe-title">${recipe.title}</span>
-                        <div class="recipe-meta-badges">
-                            <span class="recipe-meta-badge" style="${urgencyClass} background: rgba(255,255,255,0.8); border: 1px solid currentColor;">${urgencyText}</span>
-                            <span class="recipe-meta-badge">⚡ ${recipe.time}</span>
-                            <span class="recipe-meta-badge">🔥 ${recipe.difficulty}</span>
-                            <a href="${recipe.youtubeUrl || 'https://www.youtube.com/results?search_query=' + encodeURIComponent(recipe.title)}" target="_blank" rel="noopener noreferrer" class="recipe-meta-badge youtube-link" style="text-decoration: none; background: #FFEBEE; color: #D32F2F; border: 1px solid rgba(211, 47, 47, 0.15); transition: var(--transition-smooth);" onclick="event.stopPropagation()">
-                                <span>▶️</span> 영상 가이드
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="recipe-ingredients-required">
-                        <span class="recipe-ing-title">구출 대상 식재료 (유통기한 임박순 정렬)</span>
-                        ${recipe.ingredients
-                            .map(ingName => ingredients.find(i => i.name === ingName))
-                            .filter(ing => ing !== undefined)
-                            .sort((a, b) => a.dday - b.dday) // Sort individual ingredient tags inside card by D-day
-                            .map(matchedIng => {
-                                const emoji = matchedIng.emoji;
-                                const name = matchedIng.name;
-                                const dday = matchedIng.dday;
-                                
-                                // Color variables aligned with design system
-                                let tagStyle = 'background: #E8F5E9; color: #2E7D32; border: 1px solid rgba(46, 125, 50, 0.15);'; // Safe
-                                if (dday <= 1) {
-                                    tagStyle = 'background: #FFEBEE; color: #C62828; border: 1px solid rgba(198, 40, 40, 0.2); font-weight: 700;';
-                                } else if (dday <= 3) {
-                                    tagStyle = 'background: #FFF8E1; color: #F57F17; border: 1px solid rgba(245, 127, 23, 0.2); font-weight: 700;';
-                                }
-                                
-                                return `
-                                    <span class="recipe-ing-tag" style="${tagStyle} display: inline-flex; align-items: center; gap: 4px;">
-                                        <span>${emoji}</span>
-                                        <span>${name}</span>
-                                        <span style="font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 4px; background: rgba(255,255,255,0.6); margin-left: 2px;">D-${dday}</span>
-                                    </span>
-                                `;
-                            }).join('')}
-                    </div>
-
-                    <div class="recipe-steps-container">
-                        <span class="recipe-steps-title">🍳 레시피 조리법</span>
-                        ${recipe.steps.map((step, sIdx) => `
-                            <div class="recipe-step-item">
-                                <span class="step-number">${sIdx + 1}</span>
-                                <span class="step-text">${step}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-
-                    <div class="recipe-action-bar">
-                        <button class="btn-rescue-success" onclick="event.stopPropagation(); executeRescue('${recipe.title}')">
-                            🎉 식재료 구출 성공
-                        </button>
-                        <button class="btn-rescue-fail" onclick="event.stopPropagation(); executeDiscard('${recipe.title}')">
-                            🗑️ 구출 실패
-                        </button>
-                        <button class="btn-recipe-share" onclick="event.stopPropagation(); showToast('레시피 공유 링크가 복사되었습니다!', '🔗')">
-                            📤 공유
-                        </button>
-                    </div>
-
-                    <div class="recipe-expand-indicator">
-                        <span class="indicator-arrow">▼</span>
-                    </div>
-                </div>
-            `;
-        });
-        listHTML += `</div>`;
     }
 
-    container.innerHTML = headerHTML + aiGeneratorHTML + listHTML;
+    container.innerHTML = headerHTML + aiGeneratorHTML + urgentHTML + generalHTML;
 }
 
 /**
@@ -1473,10 +1767,14 @@ async function generateAIRecipe() {
 
 /**
  * Toggles a recipe card's collapsed/expanded state
- * @param {number} rIdx 
+ * @param {string|number} cardId 
  */
-function toggleRecipeCard(rIdx) {
-    const card = document.getElementById(`recipe-card-${rIdx}`);
+function toggleRecipeCard(cardId) {
+    let targetId = cardId;
+    if (typeof cardId === 'number') {
+        targetId = `recipe-card-${cardId}`;
+    }
+    const card = document.getElementById(targetId);
     if (!card) return;
     
     if (card.classList.contains('collapsed')) {
@@ -1662,8 +1960,12 @@ function renderShoppingPage(container) {
                     const guide = freshnessStorageGuideDb[name] || {
                         emoji: ingObj ? ingObj.emoji : '📦',
                         tips: "수분을 완전히 닦아내고 밀폐 용기나 지퍼백에 담아 공기 노출을 극도로 줄여 냉장 보관해 주시면 신선함이 극대화됩니다.",
-                        effect: "D-day +3일 연장 효과"
+                        effect: "D-day +3일 연장 효과",
+                        extendDays: 3
                     };
+                    const isApplied = ingObj && ingObj.storageApplied ? 'checked' : '';
+                    const hasIng = ingObj ? '' : 'disabled';
+                    
                     return `
                         <div class="teacher-guide-card">
                             <div class="guide-card-header">
@@ -1674,6 +1976,16 @@ function renderShoppingPage(container) {
                                 <span class="guide-effect-badge">${guide.effect}</span>
                             </div>
                             <p class="guide-card-tips">${guide.tips}</p>
+                            
+                            <div class="guide-preservation-toggle-row" style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(26, 35, 126, 0.1); display: flex; align-items: center; justify-content: space-between;">
+                                <label class="preservation-toggle-container ${!ingObj ? 'disabled' : ''}" style="display: inline-flex; align-items: center; gap: 6px; cursor: ${ingObj ? 'pointer' : 'not-allowed'}; opacity: ${ingObj ? 1 : 0.65};">
+                                    <input type="checkbox" ${isApplied} ${hasIng} onchange="togglePreservationStorage('${name}', this.checked)" style="accent-color: #3f51b5; width: 15px; height: 15px;" />
+                                    <span class="preservation-toggle-label" style="font-size: 11px; font-weight: 700; color: var(--text-navy);">
+                                        ❄️ 권장 보관법 적용하여 수납함 (D-day +${guide.extendDays || 3}일)
+                                    </span>
+                                </label>
+                                ${!ingObj ? '<span class="preservation-no-ing-badge" style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #FFF3E0; color: #E65100; border: 1px solid rgba(230,81,0,0.15); font-weight: 700;">⚠️ 냉장고에 없음</span>' : ''}
+                            </div>
                         </div>
                     `;
                 }).join('')}
@@ -1813,6 +2125,38 @@ function toggleTeacherIngredient(name) {
         }
     }
     
+    const contentArea = document.getElementById('content');
+    if (contentArea) renderShoppingPage(contentArea);
+}
+
+function togglePreservationStorage(name, isChecked) {
+    applyStorageMethodToInventory(name, isChecked);
+}
+
+function applyStorageMethodToInventory(name, isApplied) {
+    const item = ingredients.find(i => i.name === name);
+    if (!item) {
+        showToast(`냉장고에 '${name}'이(가) 없습니다. 인벤토리에서 먼저 추가해 주세요.`, '⚠️');
+        return;
+    }
+    const guide = freshnessStorageGuideDb[name];
+    if (!guide) return;
+    const days = guide.extendDays || 3;
+    
+    if (isApplied) {
+        if (item.storageApplied) return; // already applied
+        item.storageApplied = true;
+        item.dday += days;
+        showToast(`❄️ '${name}' 보관법 적용 완료! D-day가 ${days}일 연장되었습니다.`, '❄️');
+        triggerConfetti();
+    } else {
+        if (!item.storageApplied) return; // not applied
+        item.storageApplied = false;
+        item.dday = Math.max(0, item.dday - days);
+        showToast(`💨 '${name}' 보관법 해제! D-day가 원래대로 돌아갔습니다.`, '💨');
+    }
+    
+    // Rerender current view
     const contentArea = document.getElementById('content');
     if (contentArea) renderShoppingPage(contentArea);
 }
