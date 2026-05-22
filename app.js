@@ -1426,7 +1426,7 @@ function renderRecipeCardHTML(recipe, cardId, delayIndex) {
 }
 
 function renderRecipePage(container) {
-    const cuisines = ['한정식', '중식', '일본식', '디저트'];
+    const cuisines = ['한정식', '중식', '일본식', '분식', '디저트'];
     const filterHTML = `
         <div class="cuisine-filter-wrapper">
             <button class="cuisine-filter-arrow left" onclick="scrollCuisineFilter(-120)">
