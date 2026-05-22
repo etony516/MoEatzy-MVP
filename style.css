@@ -2602,4 +2602,336 @@ body {
     box-shadow: 0 6px 15px rgba(142, 172, 205, 0.1);
 }
 
+/* ==========================================================================
+   MoEatzy Phase 5 & 6: Elegant Pink Warning Box & Food Preferences styles
+   ========================================================================== */
+
+/* 1. Urgent Warning Box (D-3 Pink Card) */
+.urgent-warning-container {
+    background: linear-gradient(135deg, rgba(255, 235, 238, 0.75), rgba(255, 205, 210, 0.45));
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(244, 143, 177, 0.4);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 25px rgba(244, 143, 177, 0.15), inset 0 1px 0 rgba(255,255,255,0.6);
+    animation: pulse-border 3s infinite alternate, slide-in 0.4s ease-out;
+}
+
+@keyframes pulse-border {
+    0% {
+        border-color: rgba(244, 143, 177, 0.35);
+        box-shadow: 0 6px 16px rgba(244, 143, 177, 0.1);
+    }
+    100% {
+        border-color: rgba(244, 143, 177, 0.85);
+        box-shadow: 0 10px 25px rgba(244, 143, 177, 0.25);
+    }
+}
+
+.urgent-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.urgent-icon {
+    font-size: 18px;
+    animation: wiggle 1s infinite;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+}
+
+.urgent-title {
+    font-size: 15px;
+    font-weight: 850;
+    color: #880E4F;
+    letter-spacing: -0.3px;
+}
+
+.urgent-count {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 700;
+    background: rgba(233, 30, 99, 0.15);
+    color: #C2185B;
+    padding: 2.5px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(233, 30, 99, 0.1);
+}
+
+.urgent-scroll-wrapper {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    scrollbar-width: none; /* Hide scrollbar for clean feel */
+}
+
+.urgent-scroll-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.urgent-item-card {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 8px 12px;
+    min-width: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 10px rgba(233, 30, 99, 0.04);
+    transition: transform 0.2s;
+}
+
+.urgent-item-card:hover {
+    transform: scale(1.03) translateY(-1px);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.urgent-item-emoji {
+    font-size: 24px;
+}
+
+.urgent-item-name {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #37474F;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
+}
+
+.urgent-item-badge {
+    font-size: 9px !important;
+    padding: 1.5px 6px !important;
+    border-radius: 6px !important;
+}
+
+/* 2. Preferences Page Styles */
+.preferences-container {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-bottom: 40px;
+    animation: slide-in 0.4s ease-out forwards;
+}
+
+.pref-card {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: var(--glass-border);
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: var(--glass-shadow);
+    transition: transform 0.3s var(--ease-bounce), box-shadow 0.3s;
+}
+
+.pref-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(142, 172, 205, 0.12);
+}
+
+.pref-card-title {
+    font-size: 15.5px;
+    font-weight: 800;
+    color: var(--text-navy);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pref-card-desc {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    line-height: 1.45;
+}
+
+.pref-toggle-group {
+    display: flex;
+    gap: 8px;
+    background: rgba(26, 35, 126, 0.04);
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid rgba(26, 35, 126, 0.02);
+}
+
+.pref-toggle-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 10px 4px;
+    border-radius: 9px;
+    transition: all 0.25s var(--ease-bounce);
+    white-space: nowrap;
+}
+
+.pref-toggle-btn.active {
+    background: #FFFFFF;
+    color: var(--text-navy);
+    box-shadow: 0 4px 12px rgba(26, 35, 126, 0.08);
+    transform: scale(1.02);
+}
+
+.pref-allergy-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.pref-allergy-chip {
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(26, 35, 126, 0.08);
+    border-radius: 14px;
+    padding: 12px 8px;
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.25s;
+    outline: none;
+}
+
+.pref-allergy-chip.active {
+    background: rgba(26, 35, 126, 0.06);
+    border: 1.5px solid var(--text-navy);
+    color: var(--text-navy);
+    box-shadow: 0 4px 12px rgba(26, 35, 126, 0.05);
+}
+
+.pref-allergy-chip .chip-icon {
+    font-size: 16px;
+    transition: transform 0.25s;
+}
+
+.pref-allergy-chip.active .chip-icon {
+    transform: scale(1.2) rotate(10deg);
+}
+
+/* Expandable slide segments */
+.pref-sub-section {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pref-sub-section.expanded {
+    max-height: 90px;
+    opacity: 1;
+    margin-top: 14px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(26, 35, 126, 0.08);
+}
+
+.pref-sub-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-navy);
+    padding-left: 2px;
+}
+
+.pref-text-input {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1.5px solid rgba(26, 35, 126, 0.12);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-navy);
+    outline: none;
+    transition: all 0.25s;
+}
+
+.pref-text-input:focus {
+    border-color: var(--text-navy);
+    box-shadow: 0 4px 12px rgba(26, 35, 126, 0.08);
+    background: #FFFFFF;
+}
+
+.pref-save-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(232, 245, 233, 0.8), rgba(200, 230, 201, 0.5));
+    border: 1px solid rgba(76, 175, 80, 0.2);
+    border-radius: 14px;
+    padding: 12px;
+    font-size: 11.5px;
+    font-weight: 750;
+    color: #2E7D32;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.05);
+}
+
+.save-status-icon {
+    font-size: 14px;
+    animation: bounce 1.5s infinite;
+}
+
+/* 3. Subscription benefits style updates */
+.sub-benefits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 18px 0 10px 0;
+    padding: 16px 12px;
+    background: rgba(26, 35, 126, 0.03);
+    border-radius: 14px;
+    border: 1px dashed rgba(26, 35, 126, 0.08);
+}
+
+.sub-benefit-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.sub-benefit-icon {
+    font-size: 18px;
+    margin-top: 1px;
+}
+
+.sub-benefit-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.benefit-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.benefit-desc {
+    font-size: 10px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
 

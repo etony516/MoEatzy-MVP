@@ -12,6 +12,36 @@ let tempScanResults = []; // Temporary storage for OCR scanning before final mer
 // AI Generator State
 let isAiGenerating = false;
 
+// User Diet & Allergy Preferences State
+let userPreferencesState = {
+    householdSize: '1인 가구', // '1인 가구' | '2인 가구' | '3인 이상'
+    dietType: '일반식', // '일반식' | '비건/채식' | '저당/다이어트'
+    spiciness: '보통', // '순한맛' | '보통' | '매운맛'
+    lactoseIntolerant: false, // 유당불내증 여부
+    allergies: {
+        nuts: false, // 견과류
+        meat: false, // 육류
+        veggies: false, // 채소류
+        other: false // 기타
+    },
+    allergyVeggiesInput: '', // 채소류 알레르기 주관식 입력 (예: "오이, 가지")
+    allergyOtherInput: '' // 기타 알레르기 주관식 입력
+};
+
+// Load preferences from localStorage if exists
+try {
+    const savedPrefs = localStorage.getItem('moeatzy_user_preferences');
+    if (savedPrefs) {
+        userPreferencesState = JSON.parse(savedPrefs);
+    }
+} catch (e) {
+    console.error("Failed to parse user preferences from localStorage:", e);
+}
+
+function saveUserPreferences() {
+    localStorage.setItem('moeatzy_user_preferences', JSON.stringify(userPreferencesState));
+}
+
 /**
  * Asynchronously fetch local environment credentials from Environment Variables.md if available
  */
@@ -121,6 +151,9 @@ function switchTab(tabName) {
         case 'inventory':
             renderInventory(contentArea);
             break;
+        case 'preferences':
+            renderPreferencesPage(contentArea);
+            break;
         case 'recipe':
             renderRecipePage(contentArea);
             break;
@@ -221,10 +254,42 @@ function renderSortedIngredients() {
             <div class="placeholder-container">
                 <span class="placeholder-icon">📭</span>
                 <h3 class="placeholder-title">냉장고가 비어있습니다</h3>
-                <p class="placeholder-desc">상단의 스캔 기능을 이용해 식재료를 채워보세요!</p>
+                <p class="placeholder-desc">우측 하단의 스마트 스캔 기능을 이용해 식재료를 채워보세요!</p>
             </div>
         `;
         return;
+    }
+
+    // Render Urgent warning panel (D-3 or less)
+    const urgentItems = ingredients.filter(item => item.dday <= 3).sort((a, b) => a.dday - b.dday);
+    if (urgentItems.length > 0) {
+        let urgentHTML = `
+            <div class="urgent-warning-container">
+                <div class="urgent-header">
+                    <span class="urgent-icon">🚨</span>
+                    <span class="urgent-title">빨리 먹어야 해요!</span>
+                    <span class="urgent-count">${urgentItems.length}개의 재료 유통기한 임박</span>
+                </div>
+                <div class="urgent-scroll-wrapper">
+        `;
+        urgentItems.forEach(item => {
+            let badgeClass = 'badge-danger';
+            if (item.dday > 1 && item.dday <= 3) {
+                badgeClass = 'badge-warn';
+            }
+            urgentHTML += `
+                <div class="urgent-item-card">
+                    <span class="urgent-item-emoji">${item.emoji}</span>
+                    <span class="urgent-item-name">${item.name}</span>
+                    <span class="urgent-item-badge dday-badge ${badgeClass}">D-${item.dday}</span>
+                </div>
+            `;
+        });
+        urgentHTML += `
+                </div>
+            </div>
+        `;
+        listContainer.insertAdjacentHTML('beforeend', urgentHTML);
     }
     
     if (activeFilter === 'dday') {
@@ -962,7 +1027,7 @@ function renderRecipePage(container) {
                             <span class="recipe-meta-badge" style="${urgencyClass} background: rgba(255,255,255,0.8); border: 1px solid currentColor;">${urgencyText}</span>
                             <span class="recipe-meta-badge">⚡ ${recipe.time}</span>
                             <span class="recipe-meta-badge">🔥 ${recipe.difficulty}</span>
-                            <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(recipe.title + ' 레시피')}" target="_blank" rel="noopener noreferrer" class="recipe-meta-badge youtube-link" style="text-decoration: none; background: #FFEBEE; color: #D32F2F; border: 1px solid rgba(211, 47, 47, 0.15); transition: var(--transition-smooth);" onclick="event.stopPropagation()">
+                            <a href="${recipe.youtubeUrl || 'https://www.youtube.com/results?search_query=' + encodeURIComponent(recipe.title)}" target="_blank" rel="noopener noreferrer" class="recipe-meta-badge youtube-link" style="text-decoration: none; background: #FFEBEE; color: #D32F2F; border: 1px solid rgba(211, 47, 47, 0.15); transition: var(--transition-smooth);" onclick="event.stopPropagation()">
                                 <span>▶️</span> 영상 가이드
                             </a>
                         </div>
@@ -1148,10 +1213,63 @@ async function generateAIRecipe() {
         }
     }, 2000);
     
+    // Construct dynamic diet & allergy preference instructions
+    let preferenceInstructions = '';
+    
+    // 1. Household size
+    preferenceInstructions += `- 가구 구성: **${userPreferencesState.householdSize}**에 딱 맞춘 1회 분량 및 적당한 재료 분량으로 조절하세요.\n`;
+    
+    // 2. Diet type
+    if (userPreferencesState.dietType === '비건/채식') {
+        preferenceInstructions += `- **식생활 유형: 비건/채식(Vegan/Vegetarian)**입니다. 육류, 어패류, 계란, 유제품 등 동물성 재료를 절대로 레시피에 1g도 포함하지 마십시오. 완전 채식주의자 요리만 제안하세요.\n`;
+    } else if (userPreferencesState.dietType === '저당/다이어트') {
+        preferenceInstructions += `- **식생활 유형: 저당/다이어트**입니다. 설탕, 시럽, 가공 탄수화물을 억제하고 고단백 저탄수화물 위주의 건강하고 가벼운 한 끼 식사로 조리법을 조율해 주세요.\n`;
+    } else {
+        preferenceInstructions += `- 식생활 유형: 일반식입니다. 균형 잡힌 가공/자연 식재료 배합을 지향해 주세요.\n`;
+    }
+    
+    // 3. Spiciness
+    preferenceInstructions += `- **선호 맵기: ${userPreferencesState.spiciness}** 수준에 맞춰 단계별 조리법을 조절해 주세요. `;
+    if (userPreferencesState.spiciness === '순한맛') {
+        preferenceInstructions += `자극적인 고춧가루, 고추장, 과도한 후추 등을 제외하여 담백하고 부담 없는 부드러운 맛으로 유도해 주세요.\n`;
+    } else if (userPreferencesState.spiciness === '매운맛') {
+        preferenceInstructions += `고춧가루, 청양고추 등을 적절히 곁들여 맛있게 칼칼하고 매콤한 풍미를 내도록 조리 단계에 기재해 주세요.\n`;
+    } else {
+        preferenceInstructions += `대중적이고 알맞은 일반적인 간으로 지시하세요.\n`;
+    }
+    
+    // 4. Lactose Intolerance
+    if (userPreferencesState.lactoseIntolerant) {
+        preferenceInstructions += `- **유당 불내증 경고:** 우유, 생크림, 버터, 일반 슬라이스 치즈 등의 유제품을 절대로 사용하지 마십시오. 대신 아몬드유, 두유, 락토프리 제품을 쓰거나 아예 유제품이 없는 조리법을 권장해 주세요.\n`;
+    }
+    
+    // 5. Allergies
+    if (userPreferencesState.allergies.nuts) {
+        preferenceInstructions += `- **알레르기 경고 [견과류]:** 땅콩, 호두, 아몬드, 캐슈넛, 잣, 땅콩버터 등 모든 견과류 성분을 레시피에서 철저하게 배제해 주세요.\n`;
+    }
+    if (userPreferencesState.allergies.meat) {
+        preferenceInstructions += `- **알레르기/기피 경고 [육류 기피]:** 모든 종류의 가공육이나 육류(소고기, 돼지고기, 닭고기, 햄, 비엔나 소세지, 베이컨 등)를 절대 재료로 사용하지 마세요.\n`;
+    }
+    if (userPreferencesState.allergies.veggies) {
+        const veggiesStr = userPreferencesState.allergyVeggiesInput.trim();
+        if (veggiesStr) {
+            preferenceInstructions += `- **알레르기/기피 경고 [채소류 기피]:** 다음 채소류는 절대로 포함되거나 사용되어서는 안 됩니다: [**${veggiesStr}**].\n`;
+        }
+    }
+    if (userPreferencesState.allergies.other) {
+        const otherStr = userPreferencesState.allergyOtherInput.trim();
+        if (otherStr) {
+            preferenceInstructions += `- **기타 제외 요청 재료:** 다음 식재료는 레시피에서 완전히 배제해 주세요: [**${otherStr}**].\n`;
+        }
+    }
+
     const prompt = `냉장고 속 재료 목록: [${currentIngs.join(', ')}]
     
     위의 재료들을 메인으로 활용하여 100% 매칭할 수 있고 조리가 가능한 15분 현실형 꿀맛 요리 레시피를 **반드시 서로 다른 종류로 3개** 창조해서 JSON 배열 형태로 반환해줘.
     반드시 위의 제공된 재료들을 메인으로 사용하고, 제공되지 않은 다른 부재료를 필수 주재료로 강제하지 마. (소금, 식용유, 간장, 밥 같은 기본 조미료/기본 재료 정도는 부차적으로 쓸 수 있음)
+    
+    [사용자 건강 및 맞춤 식생활 제약 조건 (필수 준수!)]
+    ${preferenceInstructions}
     
     반드시 정확히 아래 명시된 JSON 배열 포맷으로 반환해줘. 마크다운 기호 없이 순수 JSON만 반환하거나, 마크다운 \`\`\`json 블록으로 감싸서 보내줘.
     
@@ -1469,9 +1587,31 @@ function renderShoppingPage(container) {
         </div>
     `;
 
+    // 2.5 Cumulative Achievement Stats (Moved from My Page for logical cohesion)
+    const statsHTML = `
+        <h3 class="section-sub-title" style="margin-top: 24px;">🏆 누적 식재료 구출 업적</h3>
+        <div class="my-stats-grid">
+            <div class="my-stat-card">
+                <span class="my-stat-emoji">🍲</span>
+                <span class="my-stat-val">12회</span>
+                <span class="my-stat-label">요리 구출 성공</span>
+            </div>
+            <div class="my-stat-card">
+                <span class="my-stat-emoji">💰</span>
+                <span class="my-stat-val">78,000원</span>
+                <span class="my-stat-label">누적 식비 절감</span>
+            </div>
+            <div class="my-stat-card">
+                <span class="my-stat-emoji">🌲</span>
+                <span class="my-stat-val">5.4kg</span>
+                <span class="my-stat-label">온실가스 감축</span>
+            </div>
+        </div>
+    `;
+
     // 3. Locked E-Commerce Basket Section
     const lockedSectionHTML = `
-        <div class="locked-buying-section">
+        <div class="locked-buying-section" style="margin-top: 24px;">
             <h3 class="section-head-title">AI 스마트 바잉 큐레이션</h3>
             
             <!-- Free Preview Item (Fully Visible) -->
@@ -1526,7 +1666,7 @@ function renderShoppingPage(container) {
         </div>
     `;
 
-    container.innerHTML = headerHTML + reportCardHTML + lockedSectionHTML;
+    container.innerHTML = headerHTML + reportCardHTML + statsHTML + lockedSectionHTML;
 
     // Trigger the bar-fill height transition after mounting to DOM
     setTimeout(() => {
@@ -1586,7 +1726,7 @@ function renderMyPage(container) {
     // 1. Header Information
     const headerHTML = `
         <h2 class="page-title">마이 모잇지</h2>
-        <p class="page-subtitle">개인화 설정과 그동안 식재료를 수호하며 얻은 친환경 기여도를 관리합니다.</p>
+        <p class="page-subtitle">개인화 서비스 구독 정보 및 활동 등급을 관리합니다.</p>
     `;
 
     // 2. Profile Card
@@ -1615,51 +1755,7 @@ function renderMyPage(container) {
         </div>
     `;
 
-    // 3. User Preferences Toggle Chips
-    const preferencesHTML = `
-        <h3 class="section-sub-title">⚙️ 맞춤 식생활 설정</h3>
-        <div class="preference-toggle-group">
-            <button class="toggle-chip active" onclick="togglePreferenceChip(this)">
-                <span>🏠</span> 1인 가구
-            </button>
-            <button class="toggle-chip" onclick="togglePreferenceChip(this)">
-                <span>🌱</span> 채식 지향
-            </button>
-            <button class="toggle-chip active" onclick="togglePreferenceChip(this)">
-                <span>🔥</span> 매운맛 선호
-            </button>
-            <button class="toggle-chip" onclick="togglePreferenceChip(this)">
-                <span>🥜</span> 견과류 알레르기
-            </button>
-            <button class="toggle-chip" onclick="togglePreferenceChip(this)">
-                <span>🥛</span> 유당 불내증
-            </button>
-        </div>
-    `;
-
-    // 4. Cumulative Achievement Stats
-    const statsHTML = `
-        <h3 class="section-sub-title">🏆 누적 식재료 구출 업적</h3>
-        <div class="my-stats-grid">
-            <div class="my-stat-card">
-                <span class="my-stat-emoji">🍲</span>
-                <span class="my-stat-val">12회</span>
-                <span class="my-stat-label">요리 구출 성공</span>
-            </div>
-            <div class="my-stat-card">
-                <span class="my-stat-emoji">💰</span>
-                <span class="my-stat-val">78,000원</span>
-                <span class="my-stat-label">누적 식비 절감</span>
-            </div>
-            <div class="my-stat-card">
-                <span class="my-stat-emoji">🌲</span>
-                <span class="my-stat-val">5.4kg</span>
-                <span class="my-stat-label">온실가스 감축</span>
-            </div>
-        </div>
-    `;
-
-    // 4.5. Premium Subscription Plan Card
+    // 3. Premium Subscription Plan Card
     const subscriptionHTML = `
         <h3 class="section-sub-title">✨ 프리미엄 요리 메이트 구독</h3>
         <div class="my-subscription-card">
@@ -1692,12 +1788,36 @@ function renderMyPage(container) {
                     <span class="tier-badge discount">16% 할인</span>
                 </div>
             </div>
+
+            <div class="sub-benefits-list">
+                <div class="sub-benefit-item">
+                    <span class="sub-benefit-icon">🧠</span>
+                    <div class="sub-benefit-text">
+                        <span class="benefit-title">무제한 AI 초개인화 레시피 추천</span>
+                        <span class="benefit-desc">나의 가구 수, 선호 맵기, 알레르기 제약을 100% 반영한 맞춤 레시피를 무제한으로 받아보세요.</span>
+                    </div>
+                </div>
+                <div class="sub-benefit-item">
+                    <span class="sub-benefit-icon">💡</span>
+                    <div class="sub-benefit-text">
+                        <span class="benefit-title">실시간 요리 영양 성분 분석</span>
+                        <span class="benefit-desc">구출 성공한 요리의 칼로리, 탄수화물, 단백질, 지방 성분을 AI가 자동으로 시각화해 줍니다.</span>
+                    </div>
+                </div>
+                <div class="sub-benefit-item">
+                    <span class="sub-benefit-icon">🚨</span>
+                    <div class="sub-benefit-text">
+                        <span class="benefit-title">유통기한 임박 긴급 카카오 푸시 알림</span>
+                        <span class="benefit-desc">식재료 유통기한이 다가오기 전에 알림을 받아 아까운 음식을 제때 구출할 수 있어요.</span>
+                    </div>
+                </div>
+            </div>
             
             <button class="btn-sub-trigger" onclick="triggerSubscription()">구독 시작하기</button>
         </div>
     `;
 
-    // 5. Future Roadmap Banner
+    // 4. Future Roadmap Banner
     const roadmapHTML = `
         <div class="roadmap-banner">
             <span class="roadmap-icon">🔔</span>
@@ -1708,7 +1828,7 @@ function renderMyPage(container) {
         </div>
     `;
 
-    container.innerHTML = headerHTML + profileCardHTML + preferencesHTML + statsHTML + subscriptionHTML + roadmapHTML;
+    container.innerHTML = headerHTML + profileCardHTML + subscriptionHTML + roadmapHTML;
 }
 
 /**
@@ -1759,4 +1879,129 @@ function triggerSubscription() {
     } else {
         openFakeDoorModal('연간 요리 메이트 플랜', '연 9,900원');
     }
+}
+
+/**
+ * Render the dedicated Preferences Page (Phase 5/6)
+ * @param {HTMLElement} container 
+ */
+function renderPreferencesPage(container) {
+    const headerHTML = `
+        <h2 class="page-title">⚙️ 식생활 맞춤 설정</h2>
+        <p class="page-subtitle">나의 가구 구성, 식습관 선호도, 알레르기를 설정하여 안전하고 딱 맞는 레시피를 추천 받습니다.</p>
+    `;
+
+    const bodyHTML = `
+        <div class="preferences-container">
+            <!-- 1. Household Size Card -->
+            <div class="pref-card">
+                <h3 class="pref-card-title">🏠 가구 구성</h3>
+                <p class="pref-card-desc">가구 규모에 맞춰 최적화된 식재료 단위와 레시피 분량을 조절합니다.</p>
+                <div class="pref-toggle-group">
+                    <button class="pref-toggle-btn ${userPreferencesState.householdSize === '1인 가구' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('householdSize', '1인 가구')">1인 가구</button>
+                    <button class="pref-toggle-btn ${userPreferencesState.householdSize === '2인 가구' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('householdSize', '2인 가구')">2인 가구</button>
+                    <button class="pref-toggle-btn ${userPreferencesState.householdSize === '3인 이상' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('householdSize', '3인 이상')">3인 이상</button>
+                </div>
+            </div>
+
+            <!-- 2. Diet Type Card -->
+            <div class="pref-card">
+                <h3 class="pref-card-title">🌱 식생활 유형</h3>
+                <p class="pref-card-desc">나만의 특별한 식단 지향점을 설정하여 식문화를 조율합니다.</p>
+                <div class="pref-toggle-group">
+                    <button class="pref-toggle-btn ${userPreferencesState.dietType === '일반식' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('dietType', '일반식')">일반식</button>
+                    <button class="pref-toggle-btn ${userPreferencesState.dietType === '비건/채식' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('dietType', '비건/채식')">비건/채식</button>
+                    <button class="pref-toggle-btn ${userPreferencesState.dietType === '저당/다이어트' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('dietType', '저당/다이어트')">저당/다이어트</button>
+                </div>
+            </div>
+
+            <!-- 3. Spiciness Card -->
+            <div class="pref-card">
+                <h3 class="pref-card-title">🔥 선호 맵기</h3>
+                <p class="pref-card-desc">조리 시 고춧가루, 후추 등의 강도를 맞춰 드립니다.</p>
+                <div class="pref-toggle-group">
+                    <button class="pref-toggle-btn ${userPreferencesState.spiciness === '순한맛' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('spiciness', '순한맛')">순한맛</button>
+                    <button class="pref-toggle-btn ${userPreferencesState.spiciness === '보통' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('spiciness', '보통')">보통</button>
+                    <button class="pref-toggle-btn ${userPreferencesState.spiciness === '매운맛' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('spiciness', '매운맛')">매운맛</button>
+                </div>
+            </div>
+
+            <!-- 4. Lactose Intolerance Card -->
+            <div class="pref-card">
+                <h3 class="pref-card-title">🥛 유당 소화능력</h3>
+                <p class="pref-card-desc">우유, 버터, 크림 등 유제품 섭취 시 민감도를 조절합니다.</p>
+                <div class="pref-toggle-group">
+                    <button class="pref-toggle-btn ${!userPreferencesState.lactoseIntolerant ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('lactoseIntolerant', false)">소화 원활</button>
+                    <button class="pref-toggle-btn ${userPreferencesState.lactoseIntolerant ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('lactoseIntolerant', true)">🥛 유당 불내증 있음</button>
+                </div>
+            </div>
+
+            <!-- 5. Allergens Card -->
+            <div class="pref-card">
+                <h3 class="pref-card-title">🛡️ 알레르기 및 기피 재료</h3>
+                <p class="pref-card-desc">체크한 성분이나 식재료는 AI가 레시피 추천 시 철저하게 제외시킵니다.</p>
+                
+                <div class="pref-allergy-grid">
+                    <button class="pref-allergy-chip ${userPreferencesState.allergies.nuts ? 'active' : ''}" onclick="togglePreferenceAllergen('nuts')">
+                        <span class="chip-icon">🥜</span> 견과류
+                    </button>
+                    <button class="pref-allergy-chip ${userPreferencesState.allergies.meat ? 'active' : ''}" onclick="togglePreferenceAllergen('meat')">
+                        <span class="chip-icon">🥩</span> 육류 기피
+                    </button>
+                    <button class="pref-allergy-chip ${userPreferencesState.allergies.veggies ? 'active' : ''}" onclick="togglePreferenceAllergen('veggies')">
+                        <span class="chip-icon">🥒</span> 채소류 기피
+                    </button>
+                    <button class="pref-allergy-chip ${userPreferencesState.allergies.other ? 'active' : ''}" onclick="togglePreferenceAllergen('other')">
+                        <span class="chip-icon">🔍</span> 기타
+                    </button>
+                </div>
+
+                <!-- Sub segment: Veggies allergy text input -->
+                <div class="pref-sub-section ${userPreferencesState.allergies.veggies ? 'expanded' : ''}" id="section-allergy-veggies">
+                    <label class="pref-sub-label">⚠️ 기피하거나 알레르기가 있는 채소를 입력하세요:</label>
+                    <input type="text" class="pref-text-input" placeholder="예: 오이, 가지, 당근 (쉼표로 구분)" value="${userPreferencesState.allergyVeggiesInput}" oninput="updatePreferenceTextInput('allergyVeggiesInput', this.value)">
+                </div>
+
+                <!-- Sub segment: Other allergy text input -->
+                <div class="pref-sub-section ${userPreferencesState.allergies.other ? 'expanded' : ''}" id="section-allergy-other">
+                    <label class="pref-sub-label">🔍 기타 제외를 원하는 재료를 적어주세요:</label>
+                    <input type="text" class="pref-text-input" placeholder="예: 복숭아, 고수 (쉼표로 구분)" value="${userPreferencesState.allergyOtherInput}" oninput="updatePreferenceTextInput('allergyOtherInput', this.value)">
+                </div>
+            </div>
+            
+            <div class="pref-save-banner">
+                <span class="save-status-icon">✅</span> 맞춤 식생활 설정이 자동 적용 중입니다!
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = headerHTML + bodyHTML;
+}
+
+/**
+ * Handle preference updates and refresh screen
+ */
+function updatePreferenceFieldAndRender(field, value) {
+    userPreferencesState[field] = value;
+    saveUserPreferences();
+    const contentArea = document.getElementById('content');
+    renderPreferencesPage(contentArea);
+}
+
+/**
+ * Handle preference allergen toggles
+ */
+function togglePreferenceAllergen(allergen) {
+    userPreferencesState.allergies[allergen] = !userPreferencesState.allergies[allergen];
+    saveUserPreferences();
+    const contentArea = document.getElementById('content');
+    renderPreferencesPage(contentArea);
+}
+
+/**
+ * Handle text input preference updates silently to avoid focus loss
+ */
+function updatePreferenceTextInput(field, value) {
+    userPreferencesState[field] = value;
+    saveUserPreferences();
 }

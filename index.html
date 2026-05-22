@@ -17,10 +17,6 @@
         <!-- 상단 헤더 영역 -->
         <header class="app-header">
             <h1 class="logo">Mo<span>Eatzy</span></h1>
-            <button id="header-scan-btn" class="header-scan-btn" onclick="openScanModal()">
-                <span class="scan-btn-icon">📸</span>
-                <span class="scan-btn-text">스캔 등록</span>
-            </button>
         </header>
 
         <!-- 메인 컨텐츠 영역 -->
@@ -39,6 +35,10 @@
             <button id="tab-inventory" class="tab-item" onclick="switchTab('inventory')">
                 <span class="tab-icon">🥬</span>
                 <span class="tab-label">인벤토리</span>
+            </button>
+            <button id="tab-preferences" class="tab-item" onclick="switchTab('preferences')">
+                <span class="tab-icon">⚙️</span>
+                <span class="tab-label">맞춤 설정</span>
             </button>
             <button id="tab-recipe" class="tab-item" onclick="switchTab('recipe')">
                 <span class="tab-icon">🍳</span>
