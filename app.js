@@ -1382,10 +1382,13 @@ function renderRecipePage(container) {
         <p class="page-subtitle">냉장고에 부재료 매수 없이, 오직 현재 있는 식재료만으로 100% 만드는 15분 식탁.</p>
     `;
     
-    // Filter recipes: Bypassing filter for all static recipes to make them robust
+    // Filter recipes that can be made with current ingredients OR are the three default static recipes!
     const matchedRecipes = recipes.filter(recipe => {
         if (recipe.isAI) return true;
-        return true;
+        // The three core default recipes must always be displayed by default, even if the user deletes some ingredients
+        if (recipe.title === "대파계란볶음밥" || recipe.title === "소세지 볶음" || recipe.title === "애호박 된장찌개") return true;
+        // Other recipes are only matched if all required ingredients are in the current refrigerator
+        return recipe.ingredients.every(reqName => ingredients.some(myIng => myIng.name === reqName));
     });
     
     // Sort recipes by the minimum dday of their required ingredients (ascending - most urgent first)
