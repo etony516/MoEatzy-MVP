@@ -2934,4 +2934,247 @@ body {
     line-height: 1.4;
 }
 
+/* ==========================================================================
+   Refrigerator Teacher Custom Styles
+   ========================================================================== */
+
+.teacher-container {
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: var(--glass-shadow);
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 24px;
+}
+
+.teacher-chips-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.teacher-chip {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1.5px solid rgba(26, 35, 126, 0.08);
+    border-radius: 30px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+}
+
+.teacher-chip:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(26, 35, 126, 0.2);
+}
+
+.teacher-chip.active {
+    background: linear-gradient(135deg, rgba(26, 35, 126, 0.08) 0%, rgba(48, 63, 159, 0.08) 100%);
+    border: 1.8px solid var(--text-navy);
+    color: var(--text-navy);
+    box-shadow: 0 4px 12px rgba(26, 35, 126, 0.1);
+    transform: translateY(-1px);
+}
+
+.teacher-chip-emoji {
+    font-size: 15px;
+    transition: transform 0.2s;
+}
+
+.teacher-chip.active .teacher-chip-emoji {
+    transform: scale(1.2) rotate(-5deg);
+}
+
+/* Empty State */
+.teacher-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 40px 20px;
+    background: rgba(26, 35, 126, 0.02);
+    border: 1px dashed rgba(26, 35, 126, 0.08);
+    border-radius: 20px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.teacher-empty-state .empty-icon {
+    font-size: 28px;
+    animation: pulse 2s infinite;
+}
+
+.teacher-empty-state p {
+    font-size: 11.5px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Guides list */
+.teacher-guides-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.teacher-guide-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(227, 242, 253, 0.45) 100%);
+    border: 1px solid rgba(144, 202, 249, 0.25);
+    border-radius: 20px;
+    padding: 16px 18px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.02);
+    transition: transform 0.3s;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.teacher-guide-card:hover {
+    transform: scale(1.01);
+}
+
+.guide-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.guide-emoji-badge {
+    font-size: 18px;
+    background: rgba(255, 255, 255, 0.9);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.guide-ingredient-name {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.guide-effect-badge {
+    font-size: 9.5px;
+    font-weight: 850;
+    color: #2E7D32;
+    background: #E8F5E9;
+    padding: 3px 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(46, 125, 50, 0.15);
+    box-shadow: 0 2px 4px rgba(46, 125, 50, 0.05);
+}
+
+.guide-card-tips {
+    font-size: 11.5px;
+    color: #37474F;
+    line-height: 1.55;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Premium Lock Card */
+.teacher-lock-card {
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(243, 229, 245, 0.8) 100%);
+    border: 1.5px solid rgba(186, 104, 200, 0.3);
+    border-radius: 20px;
+    padding: 24px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 25px rgba(186, 104, 200, 0.15);
+    overflow: hidden;
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.lock-glow-effect {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(186, 104, 200, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.teacher-lock-card .lock-icon {
+    font-size: 32px;
+    animation: wiggle 1.2s infinite ease-in-out;
+}
+
+.teacher-lock-card .lock-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #4A148C;
+    margin: 0;
+}
+
+.teacher-lock-card .lock-desc {
+    font-size: 11px;
+    color: #5E35B1;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.btn-lock-unlock {
+    width: 100%;
+    background: linear-gradient(135deg, #7B1FA2 0%, #4A148C 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(123, 31, 162, 0.3);
+    transition: all 0.2s;
+    outline: none;
+}
+
+.btn-lock-unlock:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(123, 31, 162, 0.4);
+}
+
+.btn-lock-unlock:active {
+    transform: scale(0.98);
+}
+
+/* Cancel Subscription Button state */
+.btn-sub-trigger.cancel {
+    transition: all 0.25s;
+}
+
+.btn-sub-trigger.cancel:hover {
+    background: linear-gradient(135deg, #90A4AE 0%, #607D8B 100%) !important;
+    transform: translateY(-1px);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 

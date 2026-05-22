@@ -9,14 +9,17 @@ let isAlreadyScanned = false; // Scan lock flag
 let activeRescueRecipe = null; // Storing active recipe for subtraction
 let tempScanResults = []; // Temporary storage for OCR scanning before final merge
 
+// Premium User Subscription State (Demo bypass)
+let isPremiumUser = localStorage.getItem('moeatzy_is_premium') === 'true';
+
 // AI Generator State
 let isAiGenerating = false;
 
 // User Diet & Allergy Preferences State
 let userPreferencesState = {
     householdSize: '1인 가구', // '1인 가구' | '2인 가구' | '3인 이상'
-    dietType: '일반식', // '일반식' | '비건/채식' | '저당/다이어트'
-    spiciness: '보통', // '순한맛' | '보통' | '매운맛'
+    dietType: '일반식', // '일반식' | '비건' | '락토-오보' | '키토/저탄고지' | '저당/다이어트' | '글루텐프리'
+    spiciness: '보통', // '아주순한맛' | '순한맛' | '보통' | '매운맛'
     lactoseIntolerant: false, // 유당불내증 여부
     allergies: {
         nuts: false, // 견과류
@@ -26,6 +29,66 @@ let userPreferencesState = {
     },
     allergyVeggiesInput: '', // 채소류 알레르기 주관식 입력 (예: "오이, 가지")
     allergyOtherInput: '' // 기타 알레르기 주관식 입력
+};
+
+// Draft preferences state during active editing (Form-like submission)
+let tempPreferencesState = null;
+
+// Refrigerator Teacher selected ingredients tracking
+let teacherSelectedIngredients = [];
+let attemptedThirdSelection = false;
+
+const freshnessStorageGuideDb = {
+    "대파": {
+        emoji: "🥬",
+        tips: "송송 썬 파는 밀폐용기 바닥에 키친타월을 깔고 보관하면 수분이 흡수되어 오래 보관할 수 있습니다. 뿌리가 붙은 대파는 세워서 보관하세요.",
+        effect: "D-day +5일 연장 효과"
+    },
+    "계란": {
+        emoji: "🥚",
+        tips: "계란은 물로 씻지 않고 뾰족한 곳이 아래로 가게 꽂아 보관하세요. 냉장고 문 쪽 보다는 온도가 일정한 안쪽에 두는 것이 신선함 유지에 좋습니다.",
+        effect: "D-day +7일 연장 효과"
+    },
+    "양파": {
+        emoji: "🧅",
+        tips: "껍질을 벗기지 않은 양파는 통풍이 잘되는 망에 넣어 서늘한 상온에 두고, 깐양파는 수분을 제거한 뒤 랩으로 꼼꼼하게 낱개 포장해 냉장실에 넣으세요.",
+        effect: "D-day +10일 연장 효과"
+    },
+    "두부": {
+        emoji: "🧈",
+        tips: "남은 두부는 밀폐용기에 담아 두부가 완전히 잠기도록 깨끗한 수돗물이나 생수를 붓고 소금을 한 꼬집 뿌려 냉장 보관하면 3~4일 더 보관할 수 있습니다.",
+        effect: "D-day +4일 연장 효과"
+    },
+    "비엔나 소세지": {
+        emoji: "🌭",
+        tips: "칼집을 내어 뜨거운 물에 가볍게 데친 뒤 물기를 빼고 밀폐용기에 담아 냉장 보관하거나, 오래 두고 드실 경우 지퍼백에 넓게 펴서 냉동하세요.",
+        effect: "D-day +6일 연장 효과"
+    },
+    "애호박": {
+        emoji: "🥒",
+        tips: "물기를 완전히 말린 후 키친타월이나 랩으로 감싸 냉장실 채소칸에 줄기 쪽이 위를 향하도록 세워 두시면 무름 현상을 방지할 수 있습니다.",
+        effect: "D-day +5일 연장 효과"
+    },
+    "김치": {
+        emoji: "🌶️",
+        tips: "공기 노출을 차단하는 것이 가장 중요합니다. 김치가 국물 속에 완전히 잠기게 누름독으로 누르거나 위생 봉지를 덮어 냉장 온도를 0~2℃로 유지하세요.",
+        effect: "D-day +30일 연장 효과"
+    },
+    "새송이버섯": {
+        emoji: "🍄",
+        tips: "씻지 않은 채로 키친타월에 하나씩 말아서 밀폐용기나 위생팩에 담아 냉장실 채소칸에 넣어 두시면 습기 없이 뽀송하게 오래 유지됩니다.",
+        effect: "D-day +5일 연장 효과"
+    },
+    "우유": {
+        emoji: "🥛",
+        tips: "개봉한 우유는 집게나 집게 클립으로 공기 흡입을 막고 냉장고 문 쪽 칸 대신 온도 변화가 거의 없는 선반 중간이나 가장 안쪽에 보관하는 것이 현명합니다.",
+        effect: "D-day +3일 연장 효과"
+    },
+    "베이컨": {
+        emoji: "🥓",
+        tips: "개봉한 베이컨은 한 장씩 종이호일 위에 펼쳐서 샌드위치처럼 겹겹이 쌓아 올린 뒤 지퍼백에 밀폐해 냉동해 두면 한 장씩 꺼내 쓰기 좋습니다.",
+        effect: "D-day +7일 연장 효과"
+    }
 };
 
 // Load preferences from localStorage if exists
@@ -1220,22 +1283,30 @@ async function generateAIRecipe() {
     preferenceInstructions += `- 가구 구성: **${userPreferencesState.householdSize}**에 딱 맞춘 1회 분량 및 적당한 재료 분량으로 조절하세요.\n`;
     
     // 2. Diet type
-    if (userPreferencesState.dietType === '비건/채식') {
-        preferenceInstructions += `- **식생활 유형: 비건/채식(Vegan/Vegetarian)**입니다. 육류, 어패류, 계란, 유제품 등 동물성 재료를 절대로 레시피에 1g도 포함하지 마십시오. 완전 채식주의자 요리만 제안하세요.\n`;
+    if (userPreferencesState.dietType === '비건') {
+        preferenceInstructions += `- **식생활 유형: 비건(Vegan)**입니다. 육류, 어패류, 계란, 유제품, 꿀 등 모든 동물성 재료를 절대로 레시피에 1g도 포함하지 마십시오. 순수 100% 식물성 재료만 사용하는 요리만 제안하세요.\n`;
+    } else if (userPreferencesState.dietType === '락토-오보') {
+        preferenceInstructions += `- **식생활 유형: 락토-오보 채식(Lacto-Ovo Vegetarian)**입니다. 육류와 어패류는 제외하되, 계란(오보)과 우유/버터/치즈 등 유제품(락토)은 사용이 가능합니다. 이 제약을 맞춰 요리를 제안하세요.\n`;
+    } else if (userPreferencesState.dietType === '키토/저탄고지') {
+        preferenceInstructions += `- **식생활 유형: 키토/저탄고지(Keto/LCHF)**입니다. 순수 당류와 밀가루, 전분, 쌀밥 등 고탄수화물 식재료의 사용을 극도로 제한하고, 좋은 지방과 단백질, 풍부한 채소 중심의 고지방 저탄수화물 식단으로 구성해 주세요.\n`;
     } else if (userPreferencesState.dietType === '저당/다이어트') {
         preferenceInstructions += `- **식생활 유형: 저당/다이어트**입니다. 설탕, 시럽, 가공 탄수화물을 억제하고 고단백 저탄수화물 위주의 건강하고 가벼운 한 끼 식사로 조리법을 조율해 주세요.\n`;
+    } else if (userPreferencesState.dietType === '글루텐프리') {
+        preferenceInstructions += `- **식생활 유형: 글루텐 프리(Gluten-Free)**입니다. 밀가루, 보리, 호밀 등 글루텐이 포함된 모든 가루나 면류, 소스의 사용을 전면 금지하며, 쌀, 감자, 타피오카 전분 등 글루텐 프리 대체재를 적극 고려해 주세요.\n`;
     } else {
         preferenceInstructions += `- 식생활 유형: 일반식입니다. 균형 잡힌 가공/자연 식재료 배합을 지향해 주세요.\n`;
     }
     
     // 3. Spiciness
     preferenceInstructions += `- **선호 맵기: ${userPreferencesState.spiciness}** 수준에 맞춰 단계별 조리법을 조절해 주세요. `;
-    if (userPreferencesState.spiciness === '순한맛') {
+    if (userPreferencesState.spiciness === '아주순한맛') {
+        preferenceInstructions += `고춧가루, 고추장, 청양고추, 후추, 와사비 등 어떠한 매운맛 성분이나 자극적인 향신료도 일절 제외하여 아이들이나 자극에 민감한 사람도 편하게 먹을 수 있는 극도의 순하고 달콤/담백한 레시피로 만드세요.\n`;
+    } else if (userPreferencesState.spiciness === '순한맛') {
         preferenceInstructions += `자극적인 고춧가루, 고추장, 과도한 후추 등을 제외하여 담백하고 부담 없는 부드러운 맛으로 유도해 주세요.\n`;
     } else if (userPreferencesState.spiciness === '매운맛') {
-        preferenceInstructions += `고춧가루, 청양고추 등을 적절히 곁들여 맛있게 칼칼하고 매콤한 풍미를 내도록 조리 단계에 기재해 주세요.\n`;
+        preferenceInstructions += `고춧가루, 청양고추, 붉은 고추 등을 적극적으로 곁들여 맛있게 칼칼하고 입안이 얼얼할 정도로 화끈하고 매콤한 풍미를 내도록 조리 단계에 기재해 주세요.\n`;
     } else {
-        preferenceInstructions += `대중적이고 알맞은 일반적인 간으로 지시하세요.\n`;
+        preferenceInstructions += `대중적이고 알맞은 일반적인 매콤함과 간으로 지시하세요.\n`;
     }
     
     // 4. Lactose Intolerance
@@ -1609,64 +1680,94 @@ function renderShoppingPage(container) {
         </div>
     `;
 
-    // 3. Locked E-Commerce Basket Section
-    const lockedSectionHTML = `
-        <div class="locked-buying-section" style="margin-top: 24px;">
-            <h3 class="section-head-title">AI 스마트 바잉 큐레이션</h3>
-            
-            <!-- Free Preview Item (Fully Visible) -->
-            <div class="mock-shop-card" style="margin-bottom: 12px; border: 1px solid rgba(144, 202, 249, 0.3); background: rgba(227, 242, 253, 0.15);">
-                <div class="mock-shop-left">
-                    <span class="mock-shop-emoji">🥬</span>
-                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                        <span class="mock-shop-name" style="display: flex; align-items: center; gap: 6px;">
-                            친환경 대파 1단
-                            <span style="font-size: 8px; font-weight: 800; background: #E8F5E9; color: #2E7D32; padding: 1px 5px; border-radius: 6px; border: 1px solid rgba(46, 125, 50, 0.15)">무료체험</span>
-                        </span>
-                        <span style="font-size: 9px; color: var(--text-muted);">남은 대파 D-1 구출 최저가 연동</span>
-                    </div>
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
-                    <span class="mock-shop-right">3,200원</span>
-                    <span style="font-size: 8.5px; font-weight: 700; color: #E91E63; background: #FFEBEE; padding: 1px 4px; border-radius: 4px;">최저가 보장</span>
-                </div>
-            </div>
-            
-            <!-- Blur Area containing the rest of the cards -->
-            <div class="locked-blur-area" style="margin-top: 8px;">
-                <div class="mock-shop-card">
-                    <div class="mock-shop-left">
-                        <span class="mock-shop-emoji">🥚</span>
-                        <span class="mock-shop-name">신선 특란 10구</span>
-                        <span class="mock-shop-mall">쿠팡프레시</span>
-                    </div>
-                    <span class="mock-shop-right">4,500원</span>
-                </div>
-                <div class="mock-shop-card">
-                    <div class="mock-shop-left">
-                        <span class="mock-shop-emoji">🧈</span>
-                        <span class="mock-shop-name">국산 단단한 두부 1모</span>
-                        <span class="mock-shop-mall">이마트몰</span>
-                    </div>
-                    <span class="mock-shop-right">2,100원</span>
-                </div>
-            </div>
-            
-            <!-- Lock Floating Card on top of the blur area -->
-            <div class="lock-floating-card">
-                <span class="lock-badge-icon">🔒</span>
-                <h4 class="lock-card-title">AI 스마트 바잉 엔진 잠금</h4>
-                <p class="lock-card-desc">
-                    현재 냉장고에 남은 재료와 딱 연동되는 가장 저렴한 마켓 장바구니 묶음을 1초 만에 구성합니다.
+    // 3. Refrigerator Teacher Storage Guide Section
+    // Filter out selected items if they are no longer in the refrigerator list
+    teacherSelectedIngredients = teacherSelectedIngredients.filter(name => ingredients.some(i => i.name === name));
+
+    const chipsHTML = ingredients.map(ing => {
+        const isActive = teacherSelectedIngredients.includes(ing.name);
+        return `
+            <button class="teacher-chip ${isActive ? 'active' : ''}" onclick="toggleTeacherIngredient('${ing.name}')">
+                <span class="teacher-chip-emoji">${ing.emoji || '📦'}</span>
+                <span class="teacher-chip-name">${ing.name}</span>
+            </button>
+        `;
+    }).join('');
+
+    let guideContentHTML = '';
+
+    if (attemptedThirdSelection) {
+        // Show premium subscription lock card, hide standard results
+        guideContentHTML = `
+            <div class="teacher-lock-card">
+                <div class="lock-glow-effect"></div>
+                <span class="lock-icon">🔒</span>
+                <h4 class="lock-title">선생님의 보관 비법 한도 초과</h4>
+                <p class="lock-desc">
+                    무료 등급은 동시에 최대 <strong>2개</strong>의 가이드까지만 조회할 수 있습니다.<br>
+                    체험용 프리미엄으로 무제한 신선 보관 꿀팁을 전수받아 보세요!
                 </p>
-                <button class="btn-premium-unlock" onclick="openFakeDoorModal()">
-                    월 990원에 AI 바잉 엔진 잠금 해제하기
+                <button class="btn-lock-unlock" onclick="openFakeDoorModal('냉장고 선생님 무제한 가이드', '월 990원')">
+                    👑 체험용 프리미엄 무료 활성화하기 (🔓)
                 </button>
+            </div>
+        `;
+    } else if (teacherSelectedIngredients.length === 0) {
+        guideContentHTML = `
+            <div class="teacher-empty-state">
+                <span class="empty-icon">💡</span>
+                <p>보관법이 궁금한 냉장고 속 식재료 칩을 선택해 보세요! (최대 2개 무료)</p>
+            </div>
+        `;
+    } else {
+        guideContentHTML = `
+            <div class="teacher-guides-list">
+                ${teacherSelectedIngredients.map(name => {
+                    const ingObj = ingredients.find(i => i.name === name);
+                    const guide = freshnessStorageGuideDb[name] || {
+                        emoji: ingObj ? ingObj.emoji : '📦',
+                        tips: "수분을 완전히 닦아내고 밀폐 용기나 지퍼백에 담아 공기 노출을 극도로 줄여 냉장 보관해 주시면 신선함이 극대화됩니다.",
+                        effect: "D-day +3일 연장 효과"
+                    };
+                    return `
+                        <div class="teacher-guide-card">
+                            <div class="guide-card-header">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="guide-emoji-badge">${guide.emoji}</span>
+                                    <span class="guide-ingredient-name">${name}</span>
+                                </div>
+                                <span class="guide-effect-badge">${guide.effect}</span>
+                            </div>
+                            <p class="guide-card-tips">${guide.tips}</p>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    const teacherSectionHTML = `
+        <div class="teacher-container" style="margin-top: 28px;">
+            <div class="teacher-header">
+                <h3 class="section-head-title" style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                    👨‍🏫 냉장고 선생님의 신선 보관 백과
+                </h3>
+                <p class="section-subtitle" style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.4;">
+                    보관 온도와 습도를 제어하여 식재료 수명을 연장시키는 꿀팁을 전수합니다.
+                </p>
+            </div>
+            
+            <div class="teacher-chips-grid">
+                ${chipsHTML}
+            </div>
+            
+            <div class="teacher-guide-result-area">
+                ${guideContentHTML}
             </div>
         </div>
     `;
 
-    container.innerHTML = headerHTML + reportCardHTML + statsHTML + lockedSectionHTML;
+    container.innerHTML = headerHTML + reportCardHTML + statsHTML + teacherSectionHTML;
 
     // Trigger the bar-fill height transition after mounting to DOM
     setTimeout(() => {
@@ -1678,6 +1779,30 @@ function renderShoppingPage(container) {
             }
         });
     }, 50);
+}
+
+/**
+ * Toggle refrigerator teacher selected ingredient for storage guide
+ */
+function toggleTeacherIngredient(name) {
+    const index = teacherSelectedIngredients.indexOf(name);
+    if (index > -1) {
+        // Deselect
+        teacherSelectedIngredients.splice(index, 1);
+        attemptedThirdSelection = false;
+    } else {
+        // Try to select
+        if (!isPremiumUser && teacherSelectedIngredients.length >= 2) {
+            attemptedThirdSelection = true;
+            showToast('무료 회원은 최대 2개까지만 가이드를 볼 수 있습니다.', '🔒');
+        } else {
+            teacherSelectedIngredients.push(name);
+            attemptedThirdSelection = false;
+        }
+    }
+    
+    const contentArea = document.getElementById('content');
+    if (contentArea) renderShoppingPage(contentArea);
 }
 
 /**
@@ -1699,7 +1824,18 @@ function openFakeDoorModal(planName = '월간 프리미엄 멤버십', price = '
             선택하신 플랜: <strong style="color: #1A237E; font-size: 12.5px;">${planName} (${price})</strong><br><br>
             현재 베타 테스트 중인 프리미엄 기능입니다.<br>
             소중한 지불 의사 신호가 개발팀 서버에 100% 안전하게 기록되었습니다!<br><br>
-            정식 버전 출시 시 최우선 할인 혜택을 보내드리겠습니다. 감사합니다.
+            정식 버전 출시 시 최우선 할인 혜택을 보내드리겠습니다. 감사합니다.<br><br>
+            <div style="background: rgba(26, 35, 126, 0.05); padding: 12px; border-radius: 12px; border: 1.5px dashed rgba(26, 35, 126, 0.2); margin-top: 10px;">
+                <span style="font-size: 12px; font-weight: 800; color: #1A237E; display: block; margin-bottom: 6px;">💡 데모 체험 전용 혜택</span>
+                <span style="font-size: 10.5px; color: var(--text-muted); display: block; line-height: 1.45;">아래 버튼을 터치하여 체험용 프리미엄 회원을 활성화하고, <strong>냉장고 선생님 무제한 보관 가이드</strong> 등 프리미엄 혜택을 즉시 체험해 보세요!</span>
+            </div>
+            
+            <button class="btn-fake-confirm" onclick="enableDemoPremium()" style="margin-top: 16px; background: linear-gradient(135deg, #1A237E 0%, #303F9F 100%); color: white; border: none; font-size: 11.5px; font-weight: 800; padding: 12px; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(26, 35, 126, 0.2); transition: transform 0.2s;">
+                체험용 프리미엄 무료 활성화하기 🔓
+            </button>
+            <button class="btn-fake-confirm" onclick="closeFakeDoorModal()" style="margin-top: 8px; background: rgba(0,0,0,0.06); color: #37474F; border: none; font-size: 11px; font-weight: 700; padding: 8px; border-radius: 10px; cursor: pointer; width: 100%;">
+                닫기
+            </button>
         `;
     }
     
@@ -1716,6 +1852,36 @@ function closeFakeDoorModal() {
     if (overlay) {
         overlay.classList.remove('active');
     }
+}
+
+/**
+ * Enable demo premium status and refresh UI
+ */
+function enableDemoPremium() {
+    isPremiumUser = true;
+    localStorage.setItem('moeatzy_is_premium', 'true');
+    attemptedThirdSelection = false;
+    closeFakeDoorModal();
+    
+    // Show premium confirmation notification
+    alert('체험용 프리미엄 회원이 성공적으로 활성화되었습니다! 👑\n\n냉장고 선생님 보관 가이드 및 맞춤 설정이 무제한으로 연동됩니다.');
+    
+    // Switch to active tab to refresh layout
+    switchTab(currentTab);
+}
+
+/**
+ * Disable demo premium status and refresh UI
+ */
+function disableDemoPremium() {
+    isPremiumUser = false;
+    localStorage.setItem('moeatzy_is_premium', 'false');
+    attemptedThirdSelection = false;
+    
+    alert('체험용 프리미엄 멤버십이 해지되었습니다. 🥛\n\n무료 회원 락 상태로 무결하게 롤백 완료되었습니다.');
+    
+    // Switch to active tab to refresh layout
+    switchTab(currentTab);
 }
 
 /**
@@ -1736,8 +1902,8 @@ function renderMyPage(container) {
                 <div class="profile-avatar">👤</div>
                 <div class="profile-info">
                     <div class="profile-name-row">
-                        <span class="profile-name">김지은님</span>
-                        <span class="profile-badge">식재료 수호자 Lv.2</span>
+                        <span class="profile-name">김지은님 ${isPremiumUser ? '👑' : ''}</span>
+                        <span class="profile-badge">${isPremiumUser ? '프리미엄 요리 메이트' : '식재료 수호자 Lv.2'}</span>
                     </div>
                     <span class="profile-status">지구를 구하는 1인 가구 셰프</span>
                 </div>
@@ -1762,7 +1928,7 @@ function renderMyPage(container) {
             <div class="sub-card-header">
                 <span class="sub-premium-badge">PREMIUM</span>
                 <h4 class="sub-card-title">모잇지 프리미엄 멤버십</h4>
-                <p class="sub-card-desc">AI 스마트 바잉 엔진 언락 및 무제한 맞춤 레시피 가이드를 제공합니다.</p>
+                <p class="sub-card-desc">냉장고 선생님 무제한 보관 가이드 및 초개인화 맞춤 레시피를 무제한으로 제공합니다.</p>
             </div>
             
             <div class="sub-tiers-container">
@@ -1798,10 +1964,10 @@ function renderMyPage(container) {
                     </div>
                 </div>
                 <div class="sub-benefit-item">
-                    <span class="sub-benefit-icon">💡</span>
+                    <span class="sub-benefit-icon">👨‍🏫</span>
                     <div class="sub-benefit-text">
-                        <span class="benefit-title">실시간 요리 영양 성분 분석</span>
-                        <span class="benefit-desc">구출 성공한 요리의 칼로리, 탄수화물, 단백질, 지방 성분을 AI가 자동으로 시각화해 줍니다.</span>
+                        <span class="benefit-title">냉장고 선생님 무제한 보관 가이드</span>
+                        <span class="benefit-desc">냉장고 속 재료의 수명을 늘리는 온도·습도 맞춤형 신선도 보관 비법을 제한 없이 무제한으로 학습하세요.</span>
                     </div>
                 </div>
                 <div class="sub-benefit-item">
@@ -1813,7 +1979,11 @@ function renderMyPage(container) {
                 </div>
             </div>
             
-            <button class="btn-sub-trigger" onclick="triggerSubscription()">구독 시작하기</button>
+            ${isPremiumUser ? `
+                <button class="btn-sub-trigger cancel" onclick="disableDemoPremium()" style="background: linear-gradient(135deg, #78909C 0%, #546E7A 100%); box-shadow: 0 4px 15px rgba(84, 110, 122, 0.2);">구독 해지하기 (체험용)</button>
+            ` : `
+                <button class="btn-sub-trigger" onclick="triggerSubscription()">구독 시작하기</button>
+            `}
         </div>
     `;
 
@@ -1881,11 +2051,18 @@ function triggerSubscription() {
     }
 }
 
+let showPreferenceSaveSuccess = false; // Flag to show green banner on save
+
 /**
  * Render the dedicated Preferences Page (Phase 5/6)
  * @param {HTMLElement} container 
  */
 function renderPreferencesPage(container) {
+    // Initialize temporary state as a deep copy of userPreferencesState if it's null
+    if (tempPreferencesState === null) {
+        tempPreferencesState = JSON.parse(JSON.stringify(userPreferencesState));
+    }
+
     const headerHTML = `
         <h2 class="page-title">⚙️ 식생활 맞춤 설정</h2>
         <p class="page-subtitle">나의 가구 구성, 식습관 선호도, 알레르기를 설정하여 안전하고 딱 맞는 레시피를 추천 받습니다.</p>
@@ -1898,9 +2075,9 @@ function renderPreferencesPage(container) {
                 <h3 class="pref-card-title">🏠 가구 구성</h3>
                 <p class="pref-card-desc">가구 규모에 맞춰 최적화된 식재료 단위와 레시피 분량을 조절합니다.</p>
                 <div class="pref-toggle-group">
-                    <button class="pref-toggle-btn ${userPreferencesState.householdSize === '1인 가구' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('householdSize', '1인 가구')">1인 가구</button>
-                    <button class="pref-toggle-btn ${userPreferencesState.householdSize === '2인 가구' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('householdSize', '2인 가구')">2인 가구</button>
-                    <button class="pref-toggle-btn ${userPreferencesState.householdSize === '3인 이상' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('householdSize', '3인 이상')">3인 이상</button>
+                    <button class="pref-toggle-btn ${tempPreferencesState.householdSize === '1인 가구' ? 'active' : ''}" onclick="updateTempPreferenceField('householdSize', '1인 가구')">1인 가구</button>
+                    <button class="pref-toggle-btn ${tempPreferencesState.householdSize === '2인 가구' ? 'active' : ''}" onclick="updateTempPreferenceField('householdSize', '2인 가구')">2인 가구</button>
+                    <button class="pref-toggle-btn ${tempPreferencesState.householdSize === '3인 이상' ? 'active' : ''}" onclick="updateTempPreferenceField('householdSize', '3인 이상')">3인 이상</button>
                 </div>
             </div>
 
@@ -1908,10 +2085,13 @@ function renderPreferencesPage(container) {
             <div class="pref-card">
                 <h3 class="pref-card-title">🌱 식생활 유형</h3>
                 <p class="pref-card-desc">나만의 특별한 식단 지향점을 설정하여 식문화를 조율합니다.</p>
-                <div class="pref-toggle-group">
-                    <button class="pref-toggle-btn ${userPreferencesState.dietType === '일반식' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('dietType', '일반식')">일반식</button>
-                    <button class="pref-toggle-btn ${userPreferencesState.dietType === '비건/채식' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('dietType', '비건/채식')">비건/채식</button>
-                    <button class="pref-toggle-btn ${userPreferencesState.dietType === '저당/다이어트' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('dietType', '저당/다이어트')">저당/다이어트</button>
+                <div class="pref-toggle-grid">
+                    <button class="pref-toggle-btn ${tempPreferencesState.dietType === '일반식' ? 'active' : ''}" onclick="updateTempPreferenceField('dietType', '일반식')">🥩 일반식</button>
+                    <button class="pref-toggle-btn ${tempPreferencesState.dietType === '비건' ? 'active' : ''}" onclick="updateTempPreferenceField('dietType', '비건')">🥬 비건</button>
+                    <button class="pref-toggle-btn ${tempPreferencesState.dietType === '락토-오보' ? 'active' : ''}" onclick="updateTempPreferenceField('dietType', '락토-오보')">🍳 락토-오보</button>
+                    <button class="pref-toggle-btn ${tempPreferencesState.dietType === '키토/저탄고지' ? 'active' : ''}" onclick="updateTempPreferenceField('dietType', '키토/저탄고지')">🥑 키토/저탄고지</button>
+                    <button class="pref-toggle-btn ${tempPreferencesState.dietType === '저당/다이어트' ? 'active' : ''}" onclick="updateTempPreferenceField('dietType', '저당/다이어트')">🥗 저당/다이어트</button>
+                    <button class="pref-toggle-btn ${tempPreferencesState.dietType === '글루텐프리' ? 'active' : ''}" onclick="updateTempPreferenceField('dietType', '글루텐프리')">🌾 글루텐프리</button>
                 </div>
             </div>
 
@@ -1919,10 +2099,11 @@ function renderPreferencesPage(container) {
             <div class="pref-card">
                 <h3 class="pref-card-title">🔥 선호 맵기</h3>
                 <p class="pref-card-desc">조리 시 고춧가루, 후추 등의 강도를 맞춰 드립니다.</p>
-                <div class="pref-toggle-group">
-                    <button class="pref-toggle-btn ${userPreferencesState.spiciness === '순한맛' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('spiciness', '순한맛')">순한맛</button>
-                    <button class="pref-toggle-btn ${userPreferencesState.spiciness === '보통' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('spiciness', '보통')">보통</button>
-                    <button class="pref-toggle-btn ${userPreferencesState.spiciness === '매운맛' ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('spiciness', '매운맛')">매운맛</button>
+                <div class="pref-toggle-grid" style="grid-template-columns: repeat(2, 1fr);">
+                    <button class="pref-toggle-btn ${tempPreferencesState.spiciness === '아주순한맛' ? 'active' : ''}" onclick="updateTempPreferenceField('spiciness', '아주순한맛')">👶 아주순한맛</button>
+                    <button class="pref-toggle-btn ${tempPreferencesState.spiciness === '순한맛' ? 'active' : ''}" onclick="updateTempPreferenceField('spiciness', '순한맛')">🥛 순한맛</button>
+                    <button class="pref-toggle-btn ${tempPreferencesState.spiciness === '보통' ? 'active' : ''}" onclick="updateTempPreferenceField('spiciness', '보통')">🌶️ 보통</button>
+                    <button class="pref-toggle-btn ${tempPreferencesState.spiciness === '매운맛' ? 'active' : ''}" onclick="updateTempPreferenceField('spiciness', '매운맛')">🔥 매운맛</button>
                 </div>
             </div>
 
@@ -1931,8 +2112,8 @@ function renderPreferencesPage(container) {
                 <h3 class="pref-card-title">🥛 유당 소화능력</h3>
                 <p class="pref-card-desc">우유, 버터, 크림 등 유제품 섭취 시 민감도를 조절합니다.</p>
                 <div class="pref-toggle-group">
-                    <button class="pref-toggle-btn ${!userPreferencesState.lactoseIntolerant ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('lactoseIntolerant', false)">소화 원활</button>
-                    <button class="pref-toggle-btn ${userPreferencesState.lactoseIntolerant ? 'active' : ''}" onclick="updatePreferenceFieldAndRender('lactoseIntolerant', true)">🥛 유당 불내증 있음</button>
+                    <button class="pref-toggle-btn ${!tempPreferencesState.lactoseIntolerant ? 'active' : ''}" onclick="updateTempPreferenceField('lactoseIntolerant', false)">소화 원활</button>
+                    <button class="pref-toggle-btn ${tempPreferencesState.lactoseIntolerant ? 'active' : ''}" onclick="updateTempPreferenceField('lactoseIntolerant', true)">🥛 유당 불내증 있음</button>
                 </div>
             </div>
 
@@ -1942,36 +2123,47 @@ function renderPreferencesPage(container) {
                 <p class="pref-card-desc">체크한 성분이나 식재료는 AI가 레시피 추천 시 철저하게 제외시킵니다.</p>
                 
                 <div class="pref-allergy-grid">
-                    <button class="pref-allergy-chip ${userPreferencesState.allergies.nuts ? 'active' : ''}" onclick="togglePreferenceAllergen('nuts')">
+                    <button class="pref-allergy-chip ${tempPreferencesState.allergies.nuts ? 'active' : ''}" onclick="toggleTempPreferenceAllergen('nuts')">
                         <span class="chip-icon">🥜</span> 견과류
                     </button>
-                    <button class="pref-allergy-chip ${userPreferencesState.allergies.meat ? 'active' : ''}" onclick="togglePreferenceAllergen('meat')">
+                    <button class="pref-allergy-chip ${tempPreferencesState.allergies.meat ? 'active' : ''}" onclick="toggleTempPreferenceAllergen('meat')">
                         <span class="chip-icon">🥩</span> 육류 기피
                     </button>
-                    <button class="pref-allergy-chip ${userPreferencesState.allergies.veggies ? 'active' : ''}" onclick="togglePreferenceAllergen('veggies')">
+                    <button class="pref-allergy-chip ${tempPreferencesState.allergies.veggies ? 'active' : ''}" onclick="toggleTempPreferenceAllergen('veggies')">
                         <span class="chip-icon">🥒</span> 채소류 기피
                     </button>
-                    <button class="pref-allergy-chip ${userPreferencesState.allergies.other ? 'active' : ''}" onclick="togglePreferenceAllergen('other')">
+                    <button class="pref-allergy-chip ${tempPreferencesState.allergies.other ? 'active' : ''}" onclick="toggleTempPreferenceAllergen('other')">
                         <span class="chip-icon">🔍</span> 기타
                     </button>
                 </div>
 
                 <!-- Sub segment: Veggies allergy text input -->
-                <div class="pref-sub-section ${userPreferencesState.allergies.veggies ? 'expanded' : ''}" id="section-allergy-veggies">
+                <div class="pref-sub-section ${tempPreferencesState.allergies.veggies ? 'expanded' : ''}" id="section-allergy-veggies">
                     <label class="pref-sub-label">⚠️ 기피하거나 알레르기가 있는 채소를 입력하세요:</label>
-                    <input type="text" class="pref-text-input" placeholder="예: 오이, 가지, 당근 (쉼표로 구분)" value="${userPreferencesState.allergyVeggiesInput}" oninput="updatePreferenceTextInput('allergyVeggiesInput', this.value)">
+                    <input type="text" class="pref-text-input" placeholder="예: 오이, 가지, 당근 (쉼표로 구분)" value="${tempPreferencesState.allergyVeggiesInput}" oninput="updateTempPreferenceTextInput('allergyVeggiesInput', this.value)">
                 </div>
 
                 <!-- Sub segment: Other allergy text input -->
-                <div class="pref-sub-section ${userPreferencesState.allergies.other ? 'expanded' : ''}" id="section-allergy-other">
+                <div class="pref-sub-section ${tempPreferencesState.allergies.other ? 'expanded' : ''}" id="section-allergy-other">
                     <label class="pref-sub-label">🔍 기타 제외를 원하는 재료를 적어주세요:</label>
-                    <input type="text" class="pref-text-input" placeholder="예: 복숭아, 고수 (쉼표로 구분)" value="${userPreferencesState.allergyOtherInput}" oninput="updatePreferenceTextInput('allergyOtherInput', this.value)">
+                    <input type="text" class="pref-text-input" placeholder="예: 복숭아, 고수 (쉼표로 구분)" value="${tempPreferencesState.allergyOtherInput}" oninput="updateTempPreferenceTextInput('allergyOtherInput', this.value)">
                 </div>
             </div>
             
-            <div class="pref-save-banner">
-                <span class="save-status-icon">✅</span> 맞춤 식생활 설정이 자동 적용 중입니다!
-            </div>
+            ${showPreferenceSaveSuccess ? `
+                <div class="pref-save-banner" style="animation: slide-in 0.3s ease-out; background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); border: 1px solid #4CAF50; color: #2E7D32;">
+                    <span class="save-status-icon">✨</span> 맞춤 설정이 성공적으로 저장되었습니다! 💾
+                </div>
+            ` : `
+                <div class="pref-save-banner" style="background: rgba(0, 0, 0, 0.04); color: var(--text-muted); border: 1px solid rgba(0,0,0,0.06);">
+                    <span class="save-status-icon">💡</span> 설정을 조정한 후 아래 저장 버튼을 꼭 눌러주세요.
+                </div>
+            `}
+
+            <!-- 6. Save Form Button -->
+            <button class="btn-save-preferences" onclick="savePreferencesForm()">
+                💾 맞춤 설정 저장하기
+            </button>
         </div>
     `;
 
@@ -1979,29 +2171,62 @@ function renderPreferencesPage(container) {
 }
 
 /**
- * Handle preference updates and refresh screen
+ * Update temporary preferences field and render
  */
-function updatePreferenceFieldAndRender(field, value) {
-    userPreferencesState[field] = value;
-    saveUserPreferences();
+function updateTempPreferenceField(field, value) {
+    if (tempPreferencesState === null) {
+        tempPreferencesState = JSON.parse(JSON.stringify(userPreferencesState));
+    }
+    tempPreferencesState[field] = value;
+    showPreferenceSaveSuccess = false;
     const contentArea = document.getElementById('content');
     renderPreferencesPage(contentArea);
 }
 
 /**
- * Handle preference allergen toggles
+ * Toggle temporary preferences allergens
  */
-function togglePreferenceAllergen(allergen) {
-    userPreferencesState.allergies[allergen] = !userPreferencesState.allergies[allergen];
-    saveUserPreferences();
+function toggleTempPreferenceAllergen(allergen) {
+    if (tempPreferencesState === null) {
+        tempPreferencesState = JSON.parse(JSON.stringify(userPreferencesState));
+    }
+    tempPreferencesState.allergies[allergen] = !tempPreferencesState.allergies[allergen];
+    showPreferenceSaveSuccess = false;
     const contentArea = document.getElementById('content');
     renderPreferencesPage(contentArea);
 }
 
 /**
- * Handle text input preference updates silently to avoid focus loss
+ * Update temporary preferences text input silently (avoid focus steal)
  */
-function updatePreferenceTextInput(field, value) {
-    userPreferencesState[field] = value;
+function updateTempPreferenceTextInput(field, value) {
+    if (tempPreferencesState === null) {
+        tempPreferencesState = JSON.parse(JSON.stringify(userPreferencesState));
+    }
+    tempPreferencesState[field] = value;
+    showPreferenceSaveSuccess = false;
+}
+
+/**
+ * Commit draft temporary preferences state to permanent state & localStorage
+ */
+function savePreferencesForm() {
+    if (tempPreferencesState === null) return;
+    
+    // Copy temp state to master preference state
+    userPreferencesState = JSON.parse(JSON.stringify(tempPreferencesState));
     saveUserPreferences();
+    
+    showPreferenceSaveSuccess = true;
+    const contentArea = document.getElementById('content');
+    renderPreferencesPage(contentArea);
+    
+    // Cleanly disappear success message after 3 seconds
+    setTimeout(() => {
+        showPreferenceSaveSuccess = false;
+        if (currentTab === 'preferences') {
+            const contentArea = document.getElementById('content');
+            if (contentArea) renderPreferencesPage(contentArea);
+        }
+    }, 3000);
 }
