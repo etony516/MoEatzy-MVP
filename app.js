@@ -1356,7 +1356,7 @@ function renderRecipeCardHTML(recipe, cardId, delayIndex) {
                     ${dietBadgeHTML}
                     <span class="recipe-meta-badge">⚡ ${recipe.time}</span>
                     <span class="recipe-meta-badge">🔥 ${recipe.difficulty}</span>
-                    <a href="${recipe.youtubeUrl || 'https://www.youtube.com/results?search_query=' + encodeURIComponent(recipe.title)}" target="_blank" rel="noopener noreferrer" class="recipe-meta-badge youtube-link" style="text-decoration: none; background: #FFEBEE; color: #D32F2F; border: 1.5px solid rgba(211, 47, 47, 0.35); transition: var(--transition-smooth); font-size: 13.5px; padding: 5px 12px; font-weight: 850; box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15); display: inline-flex; align-items: center; gap: 4px;" onclick="event.stopPropagation()">
+                    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(recipe.title + ' 레시피')}" target="_blank" rel="noopener noreferrer" class="recipe-meta-badge youtube-link" style="text-decoration: none; background: #FFEBEE; color: #D32F2F; border: 1.5px solid rgba(211, 47, 47, 0.35); transition: var(--transition-smooth); font-size: 13.5px; padding: 5px 12px; font-weight: 850; box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15); display: inline-flex; align-items: center; gap: 4px;" onclick="event.stopPropagation()">
                         <span>▶️</span> 영상 가이드
                     </a>
                 </div>
