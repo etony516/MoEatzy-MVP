@@ -2486,15 +2486,20 @@ function renderMyPage(container) {
     // 2. Profile Card
     const profileCardHTML = `
         <div class="profile-card">
-            <div class="profile-header">
-                <div class="profile-avatar">👤</div>
-                <div class="profile-info">
-                    <div class="profile-name-row">
-                        <span class="profile-name">김지은님 ${isPremiumUser ? '👑' : ''}</span>
-                        <span class="profile-badge">${isPremiumUser ? '프리미엄 요리 메이트' : '식재료 수호자 Lv.2'}</span>
+            <div class="profile-header" style="justify-content: space-between; width: 100%; display: flex; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div class="profile-avatar">👤</div>
+                    <div class="profile-info">
+                        <div class="profile-name-row">
+                            <span class="profile-name">김지은님 ${isPremiumUser ? '👑' : ''}</span>
+                            <span class="profile-badge">${isPremiumUser ? '프리미엄 요리 메이트' : '식재료 수호자 Lv.2'}</span>
+                        </div>
+                        <span class="profile-status">지구를 구하는 1인 가구 셰프</span>
                     </div>
-                    <span class="profile-status">지구를 구하는 1인 가구 셰프</span>
                 </div>
+                <button class="btn-edit-profile" onclick="switchTab('preferences')">
+                    ⚙️ 개인 정보 수정
+                </button>
             </div>
             
             <div class="profile-level-container">
