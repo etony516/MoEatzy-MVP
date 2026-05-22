@@ -3759,7 +3759,8 @@ body {
     padding: 6px 4px 12px 4px;
     width: 100%;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: thin; /* Firefox: thin scrollbar */
+    scrollbar-color: rgba(26, 35, 126, 0.2) transparent; /* Firefox scrollbar color */
     cursor: grab;
     user-select: none;
 }
@@ -3768,8 +3769,25 @@ body {
     cursor: grabbing;
 }
 
+/* Custom premium scrollbar for webkit browsers */
 .cuisine-filter-container::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: block;
+    height: 4px; /* Thin visual line */
+}
+
+.cuisine-filter-container::-webkit-scrollbar-track {
+    background: rgba(26, 35, 126, 0.04);
+    border-radius: 10px;
+}
+
+.cuisine-filter-container::-webkit-scrollbar-thumb {
+    background: rgba(26, 35, 126, 0.2);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.cuisine-filter-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(26, 35, 126, 0.4);
 }
 
 /* Glassmorphic Arrows */

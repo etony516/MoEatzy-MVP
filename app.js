@@ -1531,17 +1531,26 @@ function renderRecipePage(container) {
         return getMinDday(a) - getMinDday(b);
     });
 
-    // Bifurcate recipes: Urgent (D-3 or less required ingredients) vs Category-based Recipes
+    // Bifurcate recipes: Urgent (D-3 or less required ingredients) vs Category-based Recipes (Filtered by current cuisine)
     const urgentRecipes = sortedRecipes.filter(recipe => {
+        // Must match the selected cuisine filter
+        if (recipe.cuisine !== selectedCuisineFilter) return false;
+        
         return recipe.ingredients.some(ingName => {
             const matched = ingredients.find(i => i.name === ingName);
             return matched && matched.dday <= 3;
         });
     });
 
-    // General recipes match the currently selected cuisine filter
+    // General recipes match the currently selected cuisine filter (excluding those already in urgent list)
     const generalRecipes = sortedRecipes.filter(recipe => {
-        return recipe.cuisine === selectedCuisineFilter;
+        if (recipe.cuisine !== selectedCuisineFilter) return false;
+        
+        const isUrgent = recipe.ingredients.some(ingName => {
+            const matched = ingredients.find(i => i.name === ingName);
+            return matched && matched.dday <= 3;
+        });
+        return !isUrgent;
     });
 
     let urgentHTML = '';
