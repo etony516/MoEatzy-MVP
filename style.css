@@ -3686,6 +3686,22 @@ body {
     text-align: center;
 }
 
+.scan-grid-option-btn.full-width {
+    grid-column: span 2;
+    flex-direction: row;
+    padding: 14px 20px;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 16px;
+}
+
+.scan-grid-option-btn.full-width .grid-title-desc-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
 .scan-grid-option-btn:hover {
     transform: translateY(-3px);
     background: #FFFFFF;

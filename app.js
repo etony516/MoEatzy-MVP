@@ -626,6 +626,15 @@ function initializeDynamicUI() {
                             <span class="grid-title">냉장고 촬영</span>
                             <span class="grid-desc">냉장고 사진 식재료 일괄 판별</span>
                         </button>
+                        
+                        <button class="scan-grid-option-btn full-width" onclick="triggerAlbumUpload()">
+                            <span class="grid-emoji">🖼️</span>
+                            <div class="grid-title-desc-wrapper">
+                                <span class="grid-title" style="margin: 0; font-size: 14.5px; font-weight: 850;">앨범에서 불러오기</span>
+                                <span class="grid-desc" style="margin: 0; text-align: left;">갤러리 사진 속 식재료를 AI가 인식하여 자동 등록</span>
+                            </div>
+                        </button>
+                        <input type="file" id="album-file-input" accept="image/*" style="display: none;" onchange="handleAlbumFileSelect(event)">
                     </div>
                 </div>
 
@@ -930,7 +939,7 @@ function startTechnicalScan(scanType) {
     initialView.style.display = 'none';
     loadingView.style.display = 'flex';
 
-    vfIcon.innerText = scanType === 'receipt' ? '🧾' : '🧊';
+    vfIcon.innerText = scanType === 'receipt' ? '🧾' : (scanType === 'camera' ? '🧊' : '🖼️');
 
     let progress = 0;
     const duration = 2000; 
@@ -946,7 +955,7 @@ function startTechnicalScan(scanType) {
         pct.innerText = `${Math.floor(progress)}%`;
 
         if (progress < 25) {
-            label.innerText = '이미지 데이터 로드 중...';
+            label.innerText = scanType === 'album' ? '앨범 이미지 로드 중...' : '이미지 데이터 로드 중...';
         } else if (progress < 60) {
             label.innerText = 'AI Vision 텍스트/객체 디코딩 중...';
         } else if (progress < 90) {
@@ -973,6 +982,30 @@ function startTechnicalScan(scanType) {
             }, 300);
         }
     }, intervalTime);
+}
+
+/**
+ * Triggers hidden file input to choose a photo from 기기 앨범
+ */
+function triggerAlbumUpload() {
+    const fileInput = document.getElementById('album-file-input');
+    if (fileInput) {
+        fileInput.click();
+    }
+}
+
+/**
+ * Handles picture selected from the album to start the AI scan
+ */
+function handleAlbumFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Start scanning simulation
+    startTechnicalScan('album');
+
+    // Reset input value to allow scan again
+    event.target.value = '';
 }
 
 /**
