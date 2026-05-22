@@ -907,11 +907,23 @@ function extractJsonText(text) {
         if (match && match[1]) {
             jsonText = match[1].trim();
         } else {
-            // 3. Find the first '{' and last '}' to extract the raw JSON object
-            const jsonRegex = /(\{[\s\S]*\})/i;
-            match = jsonRegex.exec(text);
-            if (match && match[1]) {
-                jsonText = match[1].trim();
+            // 3. Find the first '[' or '{' and the matching closing bracket/brace to handle both arrays and objects robustly
+            const arrayIdx = text.indexOf('[');
+            const objectIdx = text.indexOf('{');
+            if (arrayIdx !== -1 && (objectIdx === -1 || arrayIdx < objectIdx)) {
+                const lastArrayIdx = text.lastIndexOf(']');
+                if (lastArrayIdx !== -1 && lastArrayIdx > arrayIdx) {
+                    jsonText = text.substring(arrayIdx, lastArrayIdx + 1).trim();
+                } else {
+                    jsonText = text.trim();
+                }
+            } else if (objectIdx !== -1) {
+                const lastObjectIdx = text.lastIndexOf('}');
+                if (lastObjectIdx !== -1 && lastObjectIdx > objectIdx) {
+                    jsonText = text.substring(objectIdx, lastObjectIdx + 1).trim();
+                } else {
+                    jsonText = text.trim();
+                }
             } else {
                 jsonText = text.trim();
             }
@@ -992,24 +1004,26 @@ async function generateAIRecipe() {
     
     const prompt = `냉장고 속 재료 목록: [${currentIngs.join(', ')}]
     
-    위의 재료들만으로 100% 매칭할 수 있고 조리가 가능한 15분 현실형 꿀맛 요리 레시피를 1개 창조해줘.
+    위의 재료들을 메인으로 활용하여 100% 매칭할 수 있고 조리가 가능한 15분 현실형 꿀맛 요리 레시피를 **반드시 서로 다른 종류로 3개** 창조해서 JSON 배열 형태로 반환해줘.
     반드시 위의 제공된 재료들을 메인으로 사용하고, 제공되지 않은 다른 부재료를 필수 주재료로 강제하지 마. (소금, 식용유, 간장, 밥 같은 기본 조미료/기본 재료 정도는 부차적으로 쓸 수 있음)
     
-    반드시 정확히 아래 명시된 JSON 포맷 1개만 반환해줘. 마크다운 기호 없이 순수 JSON만 반환하거나, 마크다운 \`\`\`json 블록으로 감싸서 보내줘.
+    반드시 정확히 아래 명시된 JSON 배열 포맷으로 반환해줘. 마크다운 기호 없이 순수 JSON만 반환하거나, 마크다운 \`\`\`json 블록으로 감싸서 보내줘.
     
-    JSON Schema:
-    {
-      "title": "요리명 (예: 초간단 파양파 계란볶음밥)",
-      "ingredients": ["레시피에 사용된 냉장고 식재료들 중 매칭되는 정확한 이름들의 문자열 배열 (예: 대파, 계란 등)"],
-      "time": "조리시간 (예: 12분)",
-      "difficulty": "난이도 (예: 쉬움 / 보통 / 어려움 중 택1)",
-      "steps": [
-        "조리 단계 1 (간결한 한국어)",
-        "조리 단계 2",
-        "조리 단계 3",
-        "조리 단계 4 (최대 5단계)"
-      ]
-    }
+    JSON Schema (배열 형태):
+    [
+      {
+        "title": "요리명 (예: 초간단 파양파 계란볶음밥)",
+        "ingredients": ["레시피에 사용된 냉장고 식재료들 중 매칭되는 정확한 이름들의 문자열 배열 (예: 대파, 계란 등)"],
+        "time": "조리시간 (예: 12분)",
+        "difficulty": "난이도 (예: 쉬움 / 보통 / 어려움 중 택1)",
+        "steps": [
+          "조리 단계 1 (간결한 한국어)",
+          "조리 단계 2",
+          "조리 단계 3",
+          "조리 단계 4 (최대 5단계)"
+        ]
+      }
+    ]
     
     주의: 요리명 앞이나 제목에 '[AI]'와 같은 수식어는 직접 붙이지 마. 프로그램이 알아서 붙여줄게.`;
     
@@ -1085,13 +1099,17 @@ async function generateAIRecipe() {
         // Resiliently extract only the JSON block out of any conversational or markdown responses
         const jsonText = extractJsonText(responseText);
         
-        const aiRecipeObj = JSON.parse(jsonText);
+        const parsedJson = JSON.parse(jsonText);
+        const newRecipes = Array.isArray(parsedJson) ? parsedJson : [parsedJson];
         
-        // Add dynamic YouTube Search URL for bulletproof integration
-        aiRecipeObj.youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(aiRecipeObj.title)}`;
-        
-        // Push to global recipes array
-        recipes.unshift(aiRecipeObj);
+        // Reverse array before unshifting so they are inserted in their correct logical order (first recipe at the top)
+        [...newRecipes].reverse().forEach(aiRecipeObj => {
+            // Add dynamic YouTube Search URL for bulletproof integration
+            aiRecipeObj.youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(aiRecipeObj.title)}`;
+            
+            // Push to global recipes array
+            recipes.unshift(aiRecipeObj);
+        });
         
         // Clear Loading Overlay
         if (overlay) overlay.classList.remove('active');
@@ -1105,7 +1123,7 @@ async function generateAIRecipe() {
             renderRecipePage(contentArea);
         }
         
-        showToast(`AI 실시간 레시피가 창조되었습니다: ${aiRecipeObj.title}`, '✨');
+        showToast(`AI가 ${newRecipes.length}개의 맞춤 레시피를 제안했습니다!`, '✨');
         
     } catch (err) {
         console.error('[AI RECIPE COMPONENT ERROR] 생성 실패:', err);
